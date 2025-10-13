@@ -354,8 +354,8 @@ function renderSidebarBottom() {
     btn.style.height = '40px';
     btn.style.border = '1px solid #ddd';
     btn.style.borderRadius = '4px';
-    btn.style.background = idx === currentQuestionIndex ? 'skyblue' : '#f9f9f9';
-    btn.style.color = idx === currentQuestionIndex ? '#fff' : '#000';
+    btn.style.background = idx === currentQuestionIndex ? '#f9f9f9' : 'skyblue';
+    btn.style.color = idx === currentQuestionIndex ? '#000' : '#fff';
     btn.addEventListener('click', () => {
       currentQuestionIndex = idx;
       renderQuestion(currentQuestionIndex);
@@ -445,7 +445,7 @@ function renderQuestion(index) {
             .join('')}
         </ul>
       </div>
-      <div id="solution"></div>
+      <div id="solutionDiv"></div>
     </div>
   `;
 
@@ -505,14 +505,28 @@ function renderQuestion(index) {
 
   // ✅ Check Answer
   document.getElementById('checkBtn').addEventListener('click', () => {
-    console.log('Check');
-    const solutionDiv = document.getElementById('solution');
+    const selected = document.querySelector(`input[name="answer-${q.id}"]:checked`);
+    const solutionDiv = document.getElementById('solutionDiv');
     
-    if (answers[q.id] === q.correctAnswer) {
-      alert('✅ Correct!');
+    solutionDiv.innerHTML = ``;
+
+    if (selected.value === q.correct_answer) {
+      solutionDiv.innerHTML = `
+      <div id="correct" style="background-color: #c0eddbff; padding: 20px;">
+        <h3>Correct</h3>
+        ${q.solution_html}
+      </div>
+    `
     } else {
-      alert(`❌ Wrong! Correct answer: ${q.correctAnswer}`);
+      solutionDiv.innerHTML = `
+      <div id="incorrect" style="background-color: #ec8856ff; padding: 20px;">
+        <h3>Incorrect</h3>
+        ${q.solution_html}
+      </div>
+    `
     }
+    const radios = document.querySelectorAll(`input[name="answer-${q.id}"]`);
+    radios.forEach(r => r.disabled = true);
   });
 
   // 🚩 Flag Question
