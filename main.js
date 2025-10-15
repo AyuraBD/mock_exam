@@ -373,6 +373,15 @@ function renderSidebarBottom() {
 }
 // document.getElementById('submitExamBtn').addEventListener('click', submitExam);
 
+let currentExamId = 'exam-1';
+
+let examData = {
+  id: currentExamId,
+  totalTime: 0,
+  duration: 0,
+  answers: []
+};
+
 // Rendering question
 function renderQuestion(index) {
   const q = questions[index];
@@ -442,9 +451,8 @@ function renderQuestion(index) {
               (item, index) => `
                 <li style="padding: 10px;">
                   <label id="optionLabel" style="padding: 10px;">
-                    <input type="radio" name="answer-${q.id}" value="${item}" id="option-${q.id}-${index}">
-                    ${item} 
-                    
+                    <input type="radio" name="answer-${q.qid}" value="${item}" id="option-${q.qid}-${index}">
+                    ${item}
                   </label>
                 </li>
               `
@@ -455,7 +463,6 @@ function renderQuestion(index) {
       <div id="solutionDiv"></div>
     </div>
   `;
-
 
   // Question's Image
   const img = document.getElementById('patientImg');
@@ -513,11 +520,11 @@ function renderQuestion(index) {
 
   // ✅ Check Answer
   document.getElementById('checkBtn').addEventListener('click', () => {
-    const selected = document.querySelector(`input[name="answer-${q.id}"]:checked`);
-    const radios = document.querySelectorAll(`input[name="answer-${q.id}"]`);
+    const selected = document.querySelector(`input[name="answer-${q.qid}"]:checked`);
+    const radios = document.querySelectorAll(`input[name="answer-${q.qid}"]`);
     const solutionDiv = document.getElementById('solutionDiv');
 
-    document.querySelectorAll(`.answer-icon-${q.id}`).forEach(el => el.remove());
+    document.querySelectorAll(`.answer-icon-${q.qid}`).forEach(el => el.remove());
 
     radios.forEach(radio => {
       const label = radio.parentElement;
@@ -525,30 +532,29 @@ function renderQuestion(index) {
       if(radio.value === q.correct_answer){
         const icon = document.createElement('span');
         icon.textContent = `✅`;
-        icon.classList.add(`answer-icon-${q.id}`);
+        icon.classList.add(`answer-icon-${q.qid}`);
         label.appendChild(icon);
       }
       if(selected && radio === selected && radio.value !== q.correct_answer){
         const icon = document.createElement('span');
         icon.textContent = `❌`;
-        icon.classList.add(`answer-icon-${q.id}`);
+        icon.classList.add(`answer-icon-${q.qid}`);
         label.appendChild(icon);
       }
       radio.disabled = true;
     });
 
-    let currentExamId = 'exam-1';
-
-    let examData = {
-      id: currentExamId,
-      totalTime: 0,          // total time spent by the user
-      duration: 0,           // total exam duration (like 7200 sec)
-      answers: []            // array of answers
-    };
+    
     const existingIndex = examData.answers.findIndex(item => item.id === q.qid);
     if(existingIndex !== -1){
-      examData.answers[]
+      examData.answers[existingIndex].selectedOption = selected ? selected.value : null;
+    } else {
+      examData.answers.push({
+        id: q.qid,
+        selectedOption: selected ? selected.value : null
+      });
     }
+    console.log(examData);
     // let storedAnswers = JSON.parse(localStorage.getItem(currentExamId)) || [];
 
     // const existingIndex = storedAnswers.findIndex(item => item.id === q.qid);
@@ -629,6 +635,22 @@ function renderQuestion(index) {
       renderSidebarBottom();
     }
   });
+
+  const answeredQuestion = examData.answers.map(answer => answer.id === q.qid);
+  const answeredOption = examData.answers.find(option => option.id === q.qid);
+  if(answeredQuestion){
+    //  <input type="radio" name="answer-${q.qid}" value="${item}" id="option-${q.qid}-${index}"></input>
+    const savedInput = document.querySelector(`input[name="answer-${q.qid}"][value="${answeredOption.selectedOption}"]`);
+    // console.log(savedInput);
+    // document.querySelector(`input[name="answer-${q.qid}"]:checked`);
+    if(savedInput){
+      savedInput.checked = true;
+    }
+    const radios = document.querySelectorAll(`input[name="answer-${q.qid}"]`);
+    radios.forEach(radio => {
+      radio.disabled = true;
+    });
+  }
 }
 
 
