@@ -456,7 +456,6 @@ function renderQuestion(index) {
     </div>
   `;
 
-  // <span id="correct" style="color: green;"></span> <span id="wrong" style="color:red;"></span>
 
   // Question's Image
   const img = document.getElementById('patientImg');
@@ -536,7 +535,33 @@ function renderQuestion(index) {
         label.appendChild(icon);
       }
       radio.disabled = true;
-    })
+    });
+
+    let currentExamId = 'exam-1';
+
+    let examData = {
+      id: currentExamId,
+      totalTime: 0,          // total time spent by the user
+      duration: 0,           // total exam duration (like 7200 sec)
+      answers: []            // array of answers
+    };
+    const existingIndex = examData.answers.findIndex(item => item.id === q.qid);
+    if(existingIndex !== -1){
+      examData.answers[]
+    }
+    // let storedAnswers = JSON.parse(localStorage.getItem(currentExamId)) || [];
+
+    // const existingIndex = storedAnswers.findIndex(item => item.id === q.qid);
+    // if(existingIndex !== -1){
+    //   storedAnswers[existingIndex].selectedOption = selected ? selected.value : null;
+    // } else {
+    //   storedAnswers.push({
+    //     id:q.qid,
+    //     selectedOption: selected ? selected.value : null
+    //   })
+    // }
+    
+    // localStorage.setItem(currentExamId, JSON.stringify(storedAnswers));
 
     if (!selected) {
       solutionDiv.innerHTML = `
@@ -560,8 +585,7 @@ function renderQuestion(index) {
       </div>
     `
     }
-    // const radios = document.querySelectorAll(`input[name="answer-${q.id}"]`);
-    // radios.forEach(r => r.disabled = true);
+    // localStorage.setItem(selected.value)
   });
 
   // 🚩 Flag Question
