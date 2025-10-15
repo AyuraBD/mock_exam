@@ -9,10 +9,9 @@ document.body.style.fontFamily = "sans-serif";
 // === Sidebar ===
 const sidebar = document.createElement('div');
 sidebar.id = 'sidebar';
-sidebar.style.position ="absolute";
 sidebar.style.left = "0";
 sidebar.style.top = "0";
-sidebar.style.width = '400px';
+sidebar.style.width = '30%';
 sidebar.style.background = '#FFFFFF';
 sidebar.style.boxShadow = '2px 0 10px rgba(0,0,0,0.1)';
 sidebar.style.transition = 'width 0.3s';
@@ -98,17 +97,17 @@ bottomSection.appendChild(examDiv);
 
 // toggle sidebar
 toggleBtn.addEventListener('click', () => {
-  const isExpanded = sidebar.style.width === '400px';
+  const isExpanded = sidebar.style.width === '30%';
 
   if (isExpanded) {
-    sidebar.style.width = '0px';
+    sidebar.style.width = '3%';
     topSection.style.padding = "0px";
     backBtn.style.display = 'none';
     mockLabel.style.display = 'none';
     bottomSection.style.display = 'none';
     toggleBtn.textContent = '⏩';
   } else {
-    sidebar.style.width = '400px';
+    sidebar.style.width = '30%';
     topSection.style.padding = "15px";
     backBtn.style.display = 'block';
     mockLabel.style.display = 'block';
@@ -126,6 +125,7 @@ document.body.appendChild(sidebar);
 const main = document.createElement('div');
 main.id = 'main';
 main.style.flex = '1';
+main.style.width = '70%';
 main.style.background = '#F8FAFC';
 main.style.display = 'flex';
 main.style.flexDirection = 'column';
@@ -299,7 +299,7 @@ async function startMockExam() {
   const sidebarBottom = document.getElementById('sidebarBottom');
   sidebarBottom.innerHTML = `
     <div style="padding:10px;">
-      <div id="questionHead" style="padding: 20px; box-shadow: 2px 0px 20px 0px; border-radius:10px; margin-bottom: 20px;">
+      <div id="questionHead" style="padding: 15px; box-shadow: 2px 0px 20px 0px; border-radius:10px; margin-bottom: 20px;">
         <h2 id="examName" style="margin-top:0px;"></h2>
         <div id="answerPercent">
         
@@ -310,7 +310,7 @@ async function startMockExam() {
         </div>
         <button id="submitExamBtn" style="width:100%;padding:12px 8px;background:skyblue;color:white;border:none;border-radius:6px; margin:auto;">Submit Exam</button>
       </div>
-      <div id="questionIndexDiv" style="padding: 20px; box-shadow: 2px 0px 20px 0px; border-radius:10px;">
+      <div id="questionIndexDiv" style="padding: 15px; box-shadow: 2px 0px 20px 0px; border-radius:10px;">
       </div>
     </div>
   `
@@ -353,13 +353,13 @@ function renderSidebarBottom() {
   const indexContainer = document.getElementById('questionIndex');
   questions.map((q, idx) => {
     const btn = document.createElement('button');
+    btn.id = q.qid;
     btn.textContent = idx + 1;
-    btn.style.width = '50px';
-    btn.style.height = '40px';
+    btn.style.width = '40px';
+    btn.style.height = '35px';
     btn.style.border = '1px solid #ddd';
-    btn.style.borderRadius = '4px';
-    btn.style.background = idx === currentQuestionIndex ? '#f9f9f9' : 'skyblue';
-    btn.style.color = idx === currentQuestionIndex ? '#000' : '#fff';
+    btn.style.background = idx === currentQuestionIndex ? '#edce32ff' : 'skyblue';
+    btn.style.color = idx === currentQuestionIndex ? '#fff' : '#fff';
     btn.addEventListener('click', () => {
       currentQuestionIndex = idx;
       renderQuestion(currentQuestionIndex);
@@ -368,6 +368,8 @@ function renderSidebarBottom() {
     indexContainer.appendChild(btn);
   });
 
+  // Flag sidebar index buttons
+  flaggedQuestions.map(flaggedQuestion => document.getElementById(flaggedQuestion).style.borderLeft = "6px solid red")
 }
 // document.getElementById('submitExamBtn').addEventListener('click', submitExam);
 
