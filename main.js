@@ -1,5 +1,6 @@
 // Reset body style
 document.body.style.margin = "0";
+document.body.style.position = "relative";
 document.body.style.display = "flex";
 document.body.style.height = "100vh";
 document.body.style.justifyContent = 'space-between';
@@ -8,7 +9,10 @@ document.body.style.fontFamily = "sans-serif";
 // === Sidebar ===
 const sidebar = document.createElement('div');
 sidebar.id = 'sidebar';
-sidebar.style.width = '30%';
+sidebar.style.position ="absolute";
+sidebar.style.left = "0";
+sidebar.style.top = "0";
+sidebar.style.width = '400px';
 sidebar.style.background = '#FFFFFF';
 sidebar.style.boxShadow = '2px 0 10px rgba(0,0,0,0.1)';
 sidebar.style.transition = 'width 0.3s';
@@ -94,18 +98,18 @@ bottomSection.appendChild(examDiv);
 
 // toggle sidebar
 toggleBtn.addEventListener('click', () => {
-  const isExpanded = sidebar.style.width === '30%';
+  const isExpanded = sidebar.style.width === '400px';
 
   if (isExpanded) {
-    sidebar.style.width = '5%';
-    main.style.width = '95%';
+    sidebar.style.width = '0px';
+    topSection.style.padding = "0px";
     backBtn.style.display = 'none';
     mockLabel.style.display = 'none';
     bottomSection.style.display = 'none';
     toggleBtn.textContent = '⏩';
   } else {
-    sidebar.style.width = '30%';
-    main.style.width = '70%';
+    sidebar.style.width = '400px';
+    topSection.style.padding = "15px";
     backBtn.style.display = 'block';
     mockLabel.style.display = 'block';
     bottomSection.style.display = 'block';
@@ -122,7 +126,6 @@ document.body.appendChild(sidebar);
 const main = document.createElement('div');
 main.id = 'main';
 main.style.flex = '1';
-main.style.width = '70%';
 main.style.background = '#F8FAFC';
 main.style.display = 'flex';
 main.style.flexDirection = 'column';
@@ -355,8 +358,8 @@ function renderSidebarBottom() {
     btn.style.height = '40px';
     btn.style.border = '1px solid #ddd';
     btn.style.borderRadius = '4px';
-    btn.style.background = idx === currentQuestionIndex ? '#edce32ff' : 'skyblue';
-    btn.style.color = idx === currentQuestionIndex ? '#fff' : '#fff';
+    btn.style.background = idx === currentQuestionIndex ? '#f9f9f9' : 'skyblue';
+    btn.style.color = idx === currentQuestionIndex ? '#000' : '#fff';
     btn.addEventListener('click', () => {
       currentQuestionIndex = idx;
       renderQuestion(currentQuestionIndex);
@@ -414,7 +417,7 @@ function renderQuestion(index) {
   mainQuestions.innerHTML = `
     <div>
       <div style="margin-bottom:10px;">
-        <h4 style="color:blue;">Patient (${q.patient.comment})</h4>
+        <h4 style="color:blue;">Patient (${q?.patient?.comment})</h4>
         <div style="display: flex; gap: 10px;">
           <button id="photoBtn" style="background-color:skyblue; color:white; border:none; padding: 10px; border-radius:5px;">Photo</button>
           <button id="chartBtn" style="background-color:skyblue; color:white; border:none; padding: 10px; border-radius:5px;">Chart</button>
