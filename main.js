@@ -13,6 +13,7 @@ sidebar.style.background = '#FFFFFF';
 sidebar.style.boxShadow = '2px 0 10px rgba(0,0,0,0.1)';
 sidebar.style.transition = 'width 0.3s';
 sidebar.style.height = '100vh';
+sidebar.style.overflow = "scroll";
 
 // === Top section ===
 const topSection = document.createElement('div');
@@ -70,7 +71,7 @@ buttonDiv.appendChild(toggleBtn);
 const bottomSection = document.createElement('div');
 bottomSection.id = 'sidebarBottom';
 bottomSection.style.padding = '15px';
-bottomSection.style.paddingTop = '40px';
+bottomSection.style.paddingTop = '20px';
 
 bottomSection.style.fontSize = '16px';
 bottomSection.style.fontWeight = '500';
@@ -81,7 +82,7 @@ const examDiv = document.createElement('div');
 examDiv.id = "examDiv";
 examDiv.innerHTML = `
   <h3>Mock Exam</h3>
-  <h4 id="examName"></h4>
+  <h4 id="examName" style="margin-top:0px;"></h4>
 `;
 
 
@@ -296,7 +297,7 @@ async function startMockExam() {
   sidebarBottom.innerHTML = `
     <div style="padding:10px;">
       <div id="questionHead" style="padding: 20px; box-shadow: 2px 0px 20px 0px; border-radius:10px; margin-bottom: 20px;">
-        <h2 id="examName"></h2>
+        <h2 id="examName" style="margin-top:0px;"></h2>
         <div id="answerPercent">
         
         </div>
@@ -354,8 +355,8 @@ function renderSidebarBottom() {
     btn.style.height = '40px';
     btn.style.border = '1px solid #ddd';
     btn.style.borderRadius = '4px';
-    btn.style.background = idx === currentQuestionIndex ? '#f9f9f9' : 'skyblue';
-    btn.style.color = idx === currentQuestionIndex ? '#000' : '#fff';
+    btn.style.background = idx === currentQuestionIndex ? '#edce32ff' : 'skyblue';
+    btn.style.color = idx === currentQuestionIndex ? '#fff' : '#fff';
     btn.addEventListener('click', () => {
       currentQuestionIndex = idx;
       renderQuestion(currentQuestionIndex);
@@ -391,8 +392,8 @@ function renderQuestion(index) {
   mainHeader.style.display = "flex";
   mainHeader.style.justifyContent = "end";
   mainHeader.innerHTML = `
-    <button id="checkBtn" style="background-color: blue; border:none; color:white; padding: 15px; border-radius: 5px; margin-right: 10px;">Check</button>
-    <button id="flagBtn" style="border: 1px solid gray; padding: 10px;">Flag for later review</button>
+    <button id="checkBtn" style="background-color: blue; border:none; color:white; padding: 10px; border-radius: 5px; margin-right: 10px;">Check</button>
+    <button id="flagBtn" style="border: 1px solid gray; padding: 7px 10px; border-radius:5px; border-left: 7px solid gray;">Flag for later review</button>
   `;
   const mainQuestions = document.createElement('div');
   mainQuestions.id = "mainQuestions";
@@ -427,7 +428,7 @@ function renderQuestion(index) {
       </div>
 
       <div style="display:flex; justify-content: space-between; align-items: center;">
-        <h2 style="margin:0px;">${q.text}</h2>
+        <h3 style="margin:0px;">${q.text}</h3>
         <p style="display: flex; color: gray; margin:0px;">Question <span> [${index +1}]</span></p>
       </div>
       <div id="answersDiv">
@@ -435,9 +436,10 @@ function renderQuestion(index) {
           ${q.items.map(
               (item, index) => `
                 <li style="padding: 10px;">
-                  <label style="padding: 10px;">
+                  <label id="optionLabel" style="padding: 10px;">
                     <input type="radio" name="answer-${q.id}" value="${item}" id="option-${q.id}-${index}">
-                    ${item}
+                    ${item} 
+                    
                   </label>
                 </li>
               `
@@ -448,6 +450,8 @@ function renderQuestion(index) {
       <div id="solutionDiv"></div>
     </div>
   `;
+
+  // <span id="correct" style="color: green;"></span> <span id="wrong" style="color:red;"></span>
 
   // Question's Image
   const img = document.getElementById('patientImg');
@@ -506,11 +510,37 @@ function renderQuestion(index) {
   // ✅ Check Answer
   document.getElementById('checkBtn').addEventListener('click', () => {
     const selected = document.querySelector(`input[name="answer-${q.id}"]:checked`);
+    const radios = document.querySelectorAll(`input[name="answer-${q.id}"]`);
     const solutionDiv = document.getElementById('solutionDiv');
-    
-    solutionDiv.innerHTML = ``;
 
-    if (selected.value === q.correct_answer) {
+    document.querySelectorAll(`.answer-icon-${q.id}`).forEach(el => el.remove());
+
+    radios.forEach(radio => {
+      const label = radio.parentElement;
+      
+      if(radio.value === q.correct_answer){
+        const icon = document.createElement('span');
+        icon.textContent = `✅`;
+        icon.classList.add(`answer-icon-${q.id}`);
+        label.appendChild(icon);
+      }
+      if(selected && radio === selected && radio.value !== q.correct_answer){
+        const icon = document.createElement('span');
+        icon.textContent = `❌`;
+        icon.classList.add(`answer-icon-${q.id}`);
+        label.appendChild(icon);
+      }
+      radio.disabled = true;
+    })
+
+    if (!selected) {
+      solutionDiv.innerHTML = `
+      <div id="incorrect" style="background-color: #ec8856ff; padding: 20px;">
+        <h3>Incorrect</h3>
+        ${q.solution_html}
+      </div>
+    `
+    } else if(selected.value === q.correct_answer) {
       solutionDiv.innerHTML = `
       <div id="correct" style="background-color: #c0eddbff; padding: 20px;">
         <h3>Correct</h3>
@@ -525,23 +555,36 @@ function renderQuestion(index) {
       </div>
     `
     }
-    const radios = document.querySelectorAll(`input[name="answer-${q.id}"]`);
-    radios.forEach(r => r.disabled = true);
+    // const radios = document.querySelectorAll(`input[name="answer-${q.id}"]`);
+    // radios.forEach(r => r.disabled = true);
   });
 
   // 🚩 Flag Question
   document.getElementById('flagBtn').addEventListener('click', () => {
-    console.log('flag')
-    if (!flaggedQuestions.includes(q.id)) flaggedQuestions.push(q.id);
+    if (!flaggedQuestions.includes(q.qid)){
+      flaggedQuestions.push(q.qid);
+      document.getElementById('flagBtn').style.borderLeft = '7px solid red';
+    } else {
+      flaggedQuestions = flaggedQuestions.filter(qid => qid !== q.qid);
+      document.getElementById('flagBtn').style.borderLeft = '7px solid gray';
+    }
     renderSidebarBottom(); // highlight flagged
+    renderQuestion(currentQuestionIndex);
+    console.log(flaggedQuestions);
   });
 
+  const flagBtn = document.getElementById('flagBtn');
+  if(flaggedQuestions.includes(q.qid)){
+    flagBtn.style.borderLeft = '7px solid red';
+  }else{
+    flagBtn.style.borderLeft = '7px solid gray';
+  }
 
-// 📝 Navigation Buttons
+
+  // 📝 Navigation Buttons
   const prevBtn = document.getElementById('questionPrev');
   const nextBtn = document.getElementById('questionNext');
   prevBtn.addEventListener('click', ()=>{
-    console.log('prev');
     if(currentQuestionIndex > 0){
       main.innerHTML = '';
       currentQuestionIndex--;
