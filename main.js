@@ -291,7 +291,6 @@ let answers = {};
 fetchQuestions();
 
 
-// let startTime = null;
 
 async function startMockExam() {
   // startTime = totalTime - Date.now();
@@ -319,8 +318,11 @@ async function startMockExam() {
   main.innerHTML = '';
   await fetchQuestions();
   renderQuestion(currentQuestionIndex);
+  console.log("render question");
   renderSidebarBottom();
+  console.log("render sidebar");
   startTimer();
+  console.log("render timer");
 }
 
 
@@ -363,7 +365,7 @@ function renderSidebarBottom() {
     btn.addEventListener('click', () => {
       currentQuestionIndex = idx;
       renderQuestion(currentQuestionIndex);
-      renderSidebarBottom(); // re-render to update active color
+      renderSidebarBottom(); // re-render to update active color    
     });
     indexContainer.appendChild(btn);
   });
@@ -384,6 +386,7 @@ let examData = {
 
 // Rendering question
 function renderQuestion(index) {
+  console.log("Render Question", index);
   const q = questions[index];
   const optionsDiv = document.createElement('div');
   optionsDiv.id = 'options';
@@ -636,9 +639,9 @@ function renderQuestion(index) {
     }
   });
 
-  const answeredQuestion = examData.answers.map(answer => answer.id === q.qid);
+  // const answeredQuestion = examData.answers.map(answer => answer.id === q.qid);
   const answeredOption = examData.answers.find(option => option.id === q.qid);
-  if(answeredQuestion){
+  if(answeredOption){
     //  <input type="radio" name="answer-${q.qid}" value="${item}" id="option-${q.qid}-${index}"></input>
     const savedInput = document.querySelector(`input[name="answer-${q.qid}"][value="${answeredOption.selectedOption}"]`);
     // console.log(savedInput);
@@ -654,16 +657,16 @@ function renderQuestion(index) {
 }
 
 
-if (flaggedQuestions.includes(q.id)) {
-  btn.style.background = '#facc15'; // yellow for flagged
-}
-if (answers[q.id]) {
-  btn.style.background = '#16a34a'; // green for answered
-}
-if (idx === currentQuestionIndex) {
-  btn.style.background = '#3B82F6'; // blue for active
-  btn.style.color = '#fff';
-}
+// if (flaggedQuestions.includes(q.id)) {
+//   btn.style.background = '#facc15'; // yellow for flagged
+// }
+// if (answers[q.id]) { 
+//   btn.style.background = '#16a34a'; // green for answered
+// }
+// if (idx === currentQuestionIndex) {
+//   btn.style.background = '#3B82F6'; // blue for active
+//   btn.style.color = '#fff';
+// }
 
 function submitExam() {
   clearInterval(timerInterval);
