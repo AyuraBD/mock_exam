@@ -318,11 +318,8 @@ async function startMockExam() {
   main.innerHTML = '';
   await fetchQuestions();
   renderQuestion(currentQuestionIndex);
-  console.log("render question");
   renderSidebarBottom();
-  console.log("render sidebar");
   startTimer();
-  console.log("render timer");
 }
 
 
@@ -368,7 +365,18 @@ function renderSidebarBottom() {
       renderSidebarBottom(); // re-render to update active color    
     });
     indexContainer.appendChild(btn);
+
+    // Change color of answered questions index
+    examData.answers.map(answer => {
+      if(btn.id === answer.id){
+        btn.style.background = '#bfbbbb';
+        btn.style.color = 'black';
+      }
+    });
+    
   });
+
+
 
   // Flag sidebar index buttons
   flaggedQuestions.map(flaggedQuestion => document.getElementById(flaggedQuestion).style.borderLeft = "6px solid red")
@@ -386,7 +394,6 @@ let examData = {
 
 // Rendering question
 function renderQuestion(index) {
-  console.log("Render Question", index);
   const q = questions[index];
   const optionsDiv = document.createElement('div');
   optionsDiv.id = 'options';
