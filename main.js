@@ -263,14 +263,14 @@ function renderStartExam() {
   });
 }
 
-
 let questions = [];
 let fetchQuestionsTime = {};
 let currentQuestionIndex = 0;
 let timerInterval = null;
 let totalTime = 0;
 let flaggedQuestions = [];
-let answers = {};  
+let answers = {};
+let selectedOptionAnswer = [];
 
   // Function to fetch questions from API
   async function fetchQuestions() {
@@ -322,7 +322,7 @@ async function startMockExam() {
   startTimer();
 }
 
-
+// Start timer to tract exam time counting
 function startTimer() {
   const timerEl = document.getElementById('timer');
   clearInterval(timerInterval);
@@ -376,8 +376,6 @@ function renderSidebarBottom() {
     
   });
 
-
-
   // Flag sidebar index buttons
   flaggedQuestions.map(flaggedQuestion => document.getElementById(flaggedQuestion).style.borderLeft = "6px solid red")
 }
@@ -407,7 +405,6 @@ function renderQuestion(index) {
   });
 
   main.innerHTML = '';
-
 
   const mainHeader = document.createElement('div');
   mainHeader.id = "mainHeader";
@@ -535,7 +532,7 @@ function renderQuestion(index) {
     const solutionDiv = document.getElementById('solutionDiv');
 
     document.querySelectorAll(`.answer-icon-${q.qid}`).forEach(el => el.remove());
-
+// safaral baten, dammam, kuwait boarder 
     radios.forEach(radio => {
       const label = radio.parentElement;
       
@@ -561,7 +558,8 @@ function renderQuestion(index) {
     } else {
       examData.answers.push({
         id: q.qid,
-        selectedOption: selected ? selected.value : null
+        selectedOption: selected ? selected.value : null,
+        correctAnswer: q.correct_answer
       });
     }
     console.log(examData);
@@ -638,6 +636,21 @@ function renderQuestion(index) {
     }
   });
   nextBtn.addEventListener('click', ()=>{
+
+    // When the user select an option and click the next button, we will save the selected option and the id of the question
+    const selected = document.querySelector(`input[name="answer-${q.qid}"]:checked`);
+    if(selected){
+      const existingIndex = selectedOptionAnswer.findIndex(option => option.id === q.qid);
+      if(existingIndex !== -1){
+        selectedOptionAnswer[existingIndex].selectedOption = selected.value;
+      }else{
+        selectedOptionAnswer.push({
+          id:q.qid,
+          selectedOption: selected.value
+        });
+      }
+    }
+    console.log(selectedOptionAnswer);
     if(currentQuestionIndex < questions.length -1){
       main.innerHTML = '';
       currentQuestionIndex++;
