@@ -373,7 +373,16 @@ function renderSidebarBottom() {
         btn.style.color = 'black';
       }
     });
-    
+    selectedOptionAnswer.map(option => {
+      if(btn.id === option.id){
+        btn.style.background = '#bfbbbb';
+        btn.style.color = 'black';
+      }
+    });
+    if(idx === currentQuestionIndex){
+      btn.style.background = '#edce32ff';
+      btn.style.color = 'white';
+    }
   });
 
   // Flag sidebar index buttons
@@ -471,6 +480,15 @@ function renderQuestion(index) {
     </div>
   `;
 
+  // Restore previously selected answer if any and update it
+  const answered = selectedOptionAnswer.find(option => option.id === q.qid);
+  if (answered) {
+    const savedInput = document.querySelector(
+      `input[name="answer-${q.qid}"][value="${answered.selectedOption}"]`
+    );
+    if (savedInput) savedInput.checked = true;
+  }
+
   // Question's Image
   const img = document.getElementById('patientImg');
   const imgWrapper = document.getElementById('imgWrapper');
@@ -490,49 +508,18 @@ function renderQuestion(index) {
       });
     });
 
-  // 🧠 Render Options
-  // const optionsEl = document.getElementById('options');
-  // q.items.forEach(item => {
-  //   const btn = document.createElement('button');
-  //   btn.textContent = item;
-  //   btn.style.display = 'block';
-  //   btn.style.margin = '5px 0';
-  //   btn.style.padding = '8px';
-  //   btn.style.border = '1px solid #ddd';
-  //   btn.style.width = '100%';
-
-  //   if (answers[q.id] === item) {
-  //     btn.style.background = '#dbeafe'; // selected color
-  //   }
-
-  //   btn.addEventListener('click', () => {
-  //     answers[q.id] = item;
-  //     renderQuestion(currentQuestionIndex); // re-render to update highlight
-  //   });
-
-  //   optionsEl.appendChild(btn);
-  // });
-
-  // 📝 Navigation Buttons
-  // document.getElementById('questionPrev').addEventListener('click', () => {
-  //   currentQuestionIndex--;
-  //   renderQuestion(currentQuestionIndex);
-  //   renderSidebarBottom();
-  // });
-  // document.getElementById('questionNext').addEventListener('click', () => {
-  //   currentQuestionIndex++;
-  //   renderQuestion(currentQuestionIndex);
-  //   renderSidebarBottom();
-  // });
-
   // ✅ Check Answer
   document.getElementById('checkBtn').addEventListener('click', () => {
+    // Remove the selected answer from the array
+    selectedOptionAnswer = selectedOptionAnswer.filter(
+      (option) => option.id !== q.qid
+    );
+
     const selected = document.querySelector(`input[name="answer-${q.qid}"]:checked`);
     const radios = document.querySelectorAll(`input[name="answer-${q.qid}"]`);
     const solutionDiv = document.getElementById('solutionDiv');
 
     document.querySelectorAll(`.answer-icon-${q.qid}`).forEach(el => el.remove());
-// safaral baten, dammam, kuwait boarder 
     radios.forEach(radio => {
       const label = radio.parentElement;
       
@@ -562,7 +549,6 @@ function renderQuestion(index) {
         correctAnswer: q.correct_answer
       });
     }
-    console.log(examData);
     // let storedAnswers = JSON.parse(localStorage.getItem(currentExamId)) || [];
 
     // const existingIndex = storedAnswers.findIndex(item => item.id === q.qid);
@@ -636,21 +622,25 @@ function renderQuestion(index) {
     }
   });
   nextBtn.addEventListener('click', ()=>{
-
     // When the user select an option and click the next button, we will save the selected option and the id of the question
     const selected = document.querySelector(`input[name="answer-${q.qid}"]:checked`);
-    if(selected){
-      const existingIndex = selectedOptionAnswer.findIndex(option => option.id === q.qid);
-      if(existingIndex !== -1){
-        selectedOptionAnswer[existingIndex].selectedOption = selected.value;
-      }else{
-        selectedOptionAnswer.push({
-          id:q.qid,
-          selectedOption: selected.value
-        });
+    const checkedAnswer = examData.answers.find(answer => answer.id === q.qid );
+    if(!checkedAnswer){
+      if(selected){
+        const existingIndex = selectedOptionAnswer.findIndex(option => option.id === q.qid);
+        if(existingIndex !== -1){
+          selectedOptionAnswer[existingIndex].selectedOption = selected.value;
+        }else{
+          selectedOptionAnswer.push({
+            id:q.qid,
+            selectedOption: selected.value,
+            correctAnswer: q.correct_answer
+          });
+        }
       }
     }
-    console.log(selectedOptionAnswer);
+    
+    // And go to next question
     if(currentQuestionIndex < questions.length -1){
       main.innerHTML = '';
       currentQuestionIndex++;
@@ -659,13 +649,9 @@ function renderQuestion(index) {
     }
   });
 
-  // const answeredQuestion = examData.answers.map(answer => answer.id === q.qid);
   const answeredOption = examData.answers.find(option => option.id === q.qid);
   if(answeredOption){
-    //  <input type="radio" name="answer-${q.qid}" value="${item}" id="option-${q.qid}-${index}"></input>
     const savedInput = document.querySelector(`input[name="answer-${q.qid}"][value="${answeredOption.selectedOption}"]`);
-    // console.log(savedInput);
-    // document.querySelector(`input[name="answer-${q.qid}"]:checked`);
     if(savedInput){
       savedInput.checked = true;
     }
@@ -673,6 +659,48 @@ function renderQuestion(index) {
     radios.forEach(radio => {
       radio.disabled = true;
     });
+
+    document.querySelectorAll(`.answer-icon-${q.qid}`).forEach(el => el.remove());
+    radios.forEach(radio => {
+      const label = radio.parentElement;
+      // Correct answer gets
+      if (radio.value === answeredOption.correctAnswer) {
+        const icon = document.createElement('span');
+        icon.textContent = '✅';
+        icon.classList.add(`answer-icon-${q.qid}`);
+        label.appendChild(icon);
+      }
+      // User's wrong answer gets
+      if (
+        answeredOption.selectedOption &&
+        radio.value === answeredOption.selectedOption &&
+        answeredOption.selectedOption !== answeredOption.correctAnswer
+      ) {
+        const icon = document.createElement('span');
+        icon.textContent = '❌';
+        icon.classList.add(`answer-icon-${q.qid}`);
+        label.appendChild(icon);
+      }
+    });
+
+    // Restore solution block
+    const solutionDiv = document.getElementById('solutionDiv');
+    if (answeredOption.selectedOption === answeredOption.correctAnswer) {
+      solutionDiv.innerHTML = `
+        <div id="correct" style="background-color: #c0eddbff; padding: 20px;">
+          <h3>Correct</h3>
+          ${q.solution_html}
+        </div>
+      `;
+    } else {
+      solutionDiv.innerHTML = `
+        <div id="incorrect" style="background-color: #ec8856ff; padding: 20px;">
+          <h3>Incorrect</h3>
+          ${q.solution_html}
+        </div>
+      `;
+    }
+
   }
 }
 
