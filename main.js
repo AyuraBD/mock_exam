@@ -310,7 +310,7 @@ async function startMockExam() {
           <div id="answerProgressWrapper">
             <div id="answerProgressBar"></div>
           </div>
-          <p id="answerPercent">Answered: 0%</p>
+          <p id="answerPercent">0% Answered or checked</p>
 
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom:20px;">
@@ -733,7 +733,6 @@ function renderQuestion(index) {
       } else {
         selectedOptionAnswer.push({ id: q.qid, selectedOption: radio.value, correctAnswer: q.correct_answer });
       }
-
       // 🔥 update progress
       updateAnswerProgress();
     });
@@ -784,7 +783,7 @@ function updateAnswerProgress() {
   const percentText = document.getElementById('answerPercent');
 
   if(bar) bar.style.width = percent + '%';
-  if(percentText) percentText.textContent = `Answered: ${percent}%`;
+  if(percentText) percentText.textContent = `${percent}% Answered or checked`;
 }
 
 
