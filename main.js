@@ -265,7 +265,6 @@ function renderStartExam() {
 
 let questions = [];
 let result = {};
-let fetchQuestionsTime = {};
 let currentQuestionIndex = 0;
 let timerInterval = null;
 let totalTime = 0;
@@ -290,8 +289,6 @@ let examData = {
       document.getElementById('examName').textContent = data.result.name;
       questions = data.result?.questions ?? [];
       result = data.result;
-      console.log(result);
-      // fetchQuestionsTime = data.result ?? {};
       totalTime = data?.result?.duration_seconds;
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -306,12 +303,11 @@ async function startMockExam() {
     <div style="padding:10px;">
       <div id="questionHead" style="padding: 15px; box-shadow: 2px 0px 20px 0px; border-radius:10px; margin-bottom: 20px;">
         <h2 id="examName" style="margin-top:0px;"></h2>
-        <div>
-          <div id="answerProgressWrapper">
-            <div id="answerProgressBar"></div>
-          </div>
-          <p id="answerPercent">0% Answered or checked</p>
-
+        <div id="answerProgressWrapper" style="margin-bottom: 20px; position: relative; width: 100%; height: 25px; background-color: #868484ff; border-radius: 5px; overflow: hidden; margin-top: 10px;">
+          <div id="answerProgressBar" style="height: 100%; width: 0%; background-color: #4caf50; transition: width 0.3s ease;"></div>
+          <p id="answerPercent" style="color:white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0; font-weight: bold; width:100%; text-align:center;">
+            0% Answered or checked
+          </p>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom:20px;">
           <p style="margin:0px; font-size:18px;">Time left: </p>
