@@ -272,6 +272,15 @@ let totalTime = 0;
 let flaggedQuestions = [];
 let answers = {};
 let selectedOptionAnswer = [];
+
+let currentExamId = `exam-${Date.now()}`;
+let examData = {
+  id: currentExamId,
+  totalTime: 0,
+  duration: 0,
+  answers: []
+};
+
   // Function to fetch questions from API
   async function fetchQuestions() {
     try {
@@ -280,7 +289,8 @@ let selectedOptionAnswer = [];
       const data = await response.json();
       document.getElementById('examName').textContent = data.result.name;
       questions = data.result?.questions ?? [];
-      result = data;
+      result = data.result;
+      console.log(result);
       // fetchQuestionsTime = data.result ?? {};
       totalTime = data?.result?.duration_seconds;
     } catch (error) {
@@ -288,7 +298,6 @@ let selectedOptionAnswer = [];
     }
   }
 fetchQuestions();
-console.log(result, questions);
 
 
 async function startMockExam() {
@@ -297,8 +306,12 @@ async function startMockExam() {
     <div style="padding:10px;">
       <div id="questionHead" style="padding: 15px; box-shadow: 2px 0px 20px 0px; border-radius:10px; margin-bottom: 20px;">
         <h2 id="examName" style="margin-top:0px;"></h2>
-        <div id="answerPercent">
-        
+        <div>
+          <div id="answerProgressWrapper">
+            <div id="answerProgressBar"></div>
+          </div>
+          <p id="answerPercent">Answered: 0%</p>
+
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom:20px;">
           <p style="margin:0px; font-size:18px;">Time left: </p>
@@ -387,19 +400,10 @@ function renderSidebarBottom() {
   flaggedQuestions.map(flaggedQuestion => document.getElementById(flaggedQuestion).style.borderLeft = "6px solid red")
 }
 
-let currentExamId = 'exam-1';
-
-let examData = {
-  id: currentExamId,
-  totalTime: 0,
-  duration: 0,
-  answers: []
-};
-
 // Rendering question
 function renderQuestion(index) {
-
   const q = questions[index];
+  
   const optionsDiv = document.createElement('div');
   optionsDiv.id = 'options';
   q.items.forEach((item, idx)=>{
@@ -621,22 +625,22 @@ function renderQuestion(index) {
   });
   nextBtn.addEventListener('click', ()=>{
     // When the user select an option and click the next button, we will save the selected option and the id of the question
-    const selected = document.querySelector(`input[name="answer-${q.qid}"]:checked`);
-    const checkedAnswer = examData.answers.find(answer => answer.id === q.qid );
-    if(!checkedAnswer){
-      if(selected){
-        const existingIndex = selectedOptionAnswer.findIndex(option => option.id === q.qid);
-        if(existingIndex !== -1){
-          selectedOptionAnswer[existingIndex].selectedOption = selected.value;
-        }else{
-          selectedOptionAnswer.push({
-            id:q.qid,
-            selectedOption: selected.value,
-            correctAnswer: q.correct_answer
-          });
-        }
-      }
-    }
+    // const selected = document.querySelector(`input[name="answer-${q.qid}"]:checked`);
+    // const checkedAnswer = examData.answers.find(answer => answer.id === q.qid );
+    // if(!checkedAnswer){
+    //   if(selected){
+    //     const existingIndex = selectedOptionAnswer.findIndex(option => option.id === q.qid);
+    //     if(existingIndex !== -1){
+    //       selectedOptionAnswer[existingIndex].selectedOption = selected.value;
+    //     }else{
+    //       selectedOptionAnswer.push({
+    //         id:q.qid,
+    //         selectedOption: selected.value,
+    //         correctAnswer: q.correct_answer
+    //       });
+    //     }
+    //   }
+    // }
     
     // And go to next question
     if(currentQuestionIndex < questions.length -1){
@@ -698,8 +702,44 @@ function renderQuestion(index) {
         </div>
       `;
     }
-
   }
+  // user selects an option
+  const selected = document.querySelector(`input[name="answer-${q.qid}"]:checked`);
+  if(selected){
+    const existingIndex = selectedOptionAnswer.findIndex(opt => opt.id === q.qid);
+    if(existingIndex !== -1){
+      selectedOptionAnswer[existingIndex].selectedOption = selected.value;
+    } else {
+      selectedOptionAnswer.push({
+        id: q.qid,
+        selectedOption: selected.value,
+        correctAnswer: q.correct_answer
+      });
+    }
+  }
+
+  const answeredQ = getMergedAnswers().find(ans => ans.id === q.qid);
+  if(answeredQ && answeredQ.selectedOption){
+    const input = document.querySelector(`input[name="answer-${q.qid}"][value="${answeredQ.selectedOption}"]`);
+    if(input) input.checked = true;
+  }
+
+  // option selection listener
+  document.querySelectorAll(`input[name="answer-${q.qid}"]`).forEach(radio => {
+    radio.addEventListener('change', () => {
+      const existingIndex = selectedOptionAnswer.findIndex(opt => opt.id === q.qid);
+      if(existingIndex !== -1){
+        selectedOptionAnswer[existingIndex].selectedOption = radio.value;
+      } else {
+        selectedOptionAnswer.push({ id: q.qid, selectedOption: radio.value, correctAnswer: q.correct_answer });
+      }
+
+      // 🔥 update progress
+      updateAnswerProgress();
+    });
+  });
+
+  console.log(selectedOptionAnswer);
 }
 
 
@@ -714,6 +754,41 @@ function renderQuestion(index) {
 //   btn.style.color = '#fff';
 // }
 
+// Get merged answers of arrays
+function getMergedAnswers() {
+  const merged = [...examData.answers];
+  selectedOptionAnswer.forEach(sel => {
+    const idx = merged.findIndex(ans => ans.id === sel.id);
+    if(idx !== -1){
+      merged[idx].selectedOption = sel.selectedOption;
+    } else {
+      merged.push({
+        id: sel.id,
+        selectedOption: sel.selectedOption,
+        correctAnswer: sel.correctAnswer || null
+      });
+    }
+  });
+
+  return merged;
+}
+
+// Update Progress bar
+function updateAnswerProgress() {
+  const mergedAnswers = getMergedAnswers();
+  const answeredCount = mergedAnswers.filter(ans => ans.selectedOption).length;
+  const totalQuestions = questions.length;
+  const percent = totalQuestions ? Math.round((answeredCount / totalQuestions) * 100) : 0;
+
+  const bar = document.getElementById('answerProgressBar');
+  const percentText = document.getElementById('answerPercent');
+
+  if(bar) bar.style.width = percent + '%';
+  if(percentText) percentText.textContent = `Answered: ${percent}%`;
+}
+
+
+
 
 function submitExam() {
   clearInterval(timerInterval);
@@ -722,36 +797,27 @@ function submitExam() {
   examData.totalTime = totalTime;
   examData.duration = result.duration_seconds - totalTime;
 
-  selectedOptionAnswer.forEach(selected => {
-    const existingIndex = examData.answers.findIndex(ans => ans.id === selected.id);
-    if(existingIndex !== -1){
-      examData.answers[existingIndex].selectedOption = selected.selectedOption;
-    } else{
-      examData.answers.push({
-        id: selected.id,
-        selectedOption: selected.selectedOption,
-        correctAnswer: selected.correctAnswer || null
-      });
-    }
-  });
+  // merge selected answers into examData.answers
+  examData.answers = getMergedAnswers();
+
   const allExams = JSON.parse(localStorage.getItem('examResults')) || [];
-  
-  // remove the oldest exam
-  if (allExams.length >= 2) {
-    allExams.shift(); 
-  }
+
+  // keep only last 2 exams
+  if(allExams.length >= 2) allExams.shift();
+
   allExams.push(examData);
   localStorage.setItem('examResults', JSON.stringify(allExams));
 
-  console.log('Exam submitted',examData);
+  console.log('✅ Exam submitted:', examData);
 }
 
-function formatDuration(ms) {
-  const totalSec = Math.floor(ms / 1000);
-  const min = Math.floor(totalSec / 60);
-  const sec = totalSec % 60;
-  return `${min}:${sec.toString().padStart(2, '0')}`;
-}
+
+// function formatDuration(ms) {
+//   const totalSec = Math.floor(ms / 1000);
+//   const min = Math.floor(totalSec / 60);
+//   const sec = totalSec % 60;
+//   return `${min}:${sec.toString().padStart(2, '0')}`;
+// }
 
 
 
