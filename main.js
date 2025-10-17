@@ -264,6 +264,7 @@ function renderStartExam() {
 }
 
 let questions = [];
+let result = {};
 let fetchQuestionsTime = {};
 let currentQuestionIndex = 0;
 let timerInterval = null;
@@ -271,7 +272,6 @@ let totalTime = 0;
 let flaggedQuestions = [];
 let answers = {};
 let selectedOptionAnswer = [];
-
   // Function to fetch questions from API
   async function fetchQuestions() {
     try {
@@ -280,21 +280,18 @@ let selectedOptionAnswer = [];
       const data = await response.json();
       document.getElementById('examName').textContent = data.result.name;
       questions = data.result?.questions ?? [];
-      console.log(data, questions);
+      result = data;
       // fetchQuestionsTime = data.result ?? {};
       totalTime = data?.result?.duration_seconds;
     } catch (error) {
       console.error("Error fetching questions:", error);
     }
   }
-  // TODO: comment the callback func
 fetchQuestions();
-
+console.log(result, questions);
 
 
 async function startMockExam() {
-  // startTime = totalTime - Date.now();
-  // console.log(Date.now());
   const sidebarBottom = document.getElementById('sidebarBottom');
   sidebarBottom.innerHTML = `
     <div style="padding:10px;">
@@ -320,6 +317,7 @@ async function startMockExam() {
   renderQuestion(currentQuestionIndex);
   renderSidebarBottom();
   startTimer();
+  document.getElementById('submitExamBtn').addEventListener('click', submitExam);
 }
 
 // Start timer to tract exam time counting
@@ -388,7 +386,6 @@ function renderSidebarBottom() {
   // Flag sidebar index buttons
   flaggedQuestions.map(flaggedQuestion => document.getElementById(flaggedQuestion).style.borderLeft = "6px solid red")
 }
-// document.getElementById('submitExamBtn').addEventListener('click', submitExam);
 
 let currentExamId = 'exam-1';
 
@@ -401,6 +398,7 @@ let examData = {
 
 // Rendering question
 function renderQuestion(index) {
+
   const q = questions[index];
   const optionsDiv = document.createElement('div');
   optionsDiv.id = 'options';
@@ -716,32 +714,36 @@ function renderQuestion(index) {
 //   btn.style.color = '#fff';
 // }
 
+
 function submitExam() {
   clearInterval(timerInterval);
 
-  let correct = 0;
-  questions.forEach(q => {
-    if (answers[q.id] === q.correctAnswer) correct++;
+  examData.finishedAt = new Date().toISOString();
+  examData.totalTime = totalTime;
+  examData.duration = result.duration_seconds - totalTime;
+
+  selectedOptionAnswer.forEach(selected => {
+    const existingIndex = examData.answers.findIndex(ans => ans.id === selected.id);
+    if(existingIndex !== -1){
+      examData.answers[existingIndex].selectedOption = selected.selectedOption;
+    } else{
+      examData.answers.push({
+        id: selected.id,
+        selectedOption: selected.selectedOption,
+        correctAnswer: selected.correctAnswer || null
+      });
+    }
   });
+  const allExams = JSON.parse(localStorage.getItem('examResults')) || [];
+  
+  // remove the oldest exam
+  if (allExams.length >= 2) {
+    allExams.shift(); 
+  }
+  allExams.push(examData);
+  localStorage.setItem('examResults', JSON.stringify(allExams));
 
-  const result = {
-    examId: 'math_test_01',
-    totalQuestions: questions.length,
-    correct,
-    incorrect: questions.length - correct,
-    duration: formatDuration(Date.now() - startTime),
-    takenAt: new Date().toISOString()
-  };
-
-  localStorage.setItem('mockExamResult', JSON.stringify(result));
-
-  main.innerHTML = `
-    <h2>🎉 Exam Finished!</h2>
-    <p>Correct: ${result.correct}</p>
-    <p>Incorrect: ${result.incorrect}</p>
-    <p>Duration: ${result.duration}</p>
-    <button onclick="location.reload()">Back to Dashboard</button>
-  `;
+  console.log('Exam submitted',examData);
 }
 
 function formatDuration(ms) {
