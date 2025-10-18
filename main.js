@@ -183,41 +183,31 @@ function startFirstExam(){
     });
 }
 
+// Previous exam results , last exam result and retake exam
 function renderStartExam() {
-  const allExams = JSON.parse(localStorage.getItem('examResults')) || [];
-  console.log(allExams);
-  allExams.forEach((exam, index) => {
-    const answered = exam.answers.filter(a => a.selectedOption !== null);
-    const totalQuestions = exam.answers.length;
-    const correctCount = exam.answers.filter(a => a.selectedOption === a.correctAnswer).length;
-    const percentage = totalQuestions ? Math.round((correctCount / totalQuestions) * 100) : 0;
-    console.log(answered, totalQuestions, correctCount, percentage);
+  const allExams = JSON.parse(localStorage.getItem('examResults')) || [];  
+
     main.innerHTML = `
       <div style="padding-top:20px; padding-bottom: 20px;">
         <div style="border-bottom:1px solid #050505; margin-bottom: 20px;">
           <h2 style="margin: 0px; margin-bottom: 10px;">Your recent exam activity</h2>
         </div>
         <table style="width: 100%;" cellspacing="0" cellpadding="8">
-          <tr style="padding:20px; background-color: #90c3dfff;">
-            <th>
-              <select>
-                <option>How long ago?</option>
-                <option>When exactly?</option>
-              </select>
-            </th>
-            <th>Exam Score</th>
-            <th>Exam Duration</th>
-          </tr>
-          <tr>
-            <td>14 Hours ago</td>
-            <td>0%</td>
-            <td>5 Minues</td>
-          </tr>
-          <tr>
-            <td>4 months ago</td>
-            <td>76%</td>
-            <td>3 hours</td>
-          </tr>
+          <thead>
+            <tr style="padding:20px; background-color: #90c3dfff;">
+              <th>
+                <select id="timeMode">
+                  <option value="ago">How long ago?</option>
+                  <option value="exact">When exactly?</option>
+                </select>
+              </th>
+              <th>Exam Score</th>
+              <th>Exam Duration</th>
+            </tr>
+          </thead>
+          <tbody id="examTableBody">
+            
+          </tbody>
         </table>
 
         <div style="border-bottom:1px solid #90c3dfff; margin-bottom: 20px;">
@@ -227,37 +217,41 @@ function renderStartExam() {
           <h3 style="margin:0px; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">YOUR LAST SCORE</h3>
           <div style="padding: 20px; display: flex; justify-content: between; align-items: center;">
             <div style="width:50%;">
-              <p>Score Diagram</p>
+              <div class="progress-container" style="display: flex; justify-content: center; align-items: center; padding: 20px;">
+                <div class="progress-circle" style="width: 120px; height: 120px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; color: #333; background: conic-gradient(#ccc 0deg, #ccc 360deg);">
+                  <span id="percentageText" style="position: absolute;">0%</span>
+                </div>
+              </div>
+
             </div>
             <div style="width:50%;">
               <p style="margin-bottom: 15px;">To pass you need to reach 75%</p>
               <button id="startNowBtn" style="background-color: #1073a8ff; padding: 10px; border-radius: 10px;">Retake Exam</button>
             </div>
           </div>
-          <p>Last attempt: 14 hours ago</p>
+          <p>Last attempt: <span id="lastAttemp"></span></p>
         </div>
 
         <div style="border: 1px solid gray; border-radius: 10px; margin-bottom:30px;">
           <div style="display: flex; justify-content: space-between; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
             <h3 style="margin:0px; background-color: #90c3dfff; border-radius: 10px 10px 0px 0px;">CORRECTLY ANSWERED</h3>
-            <p style="margin:0px;"><span style="color:green;">0</span>/<span>75</span></p>
+            <p style="margin:0px;"><span id="correctCountHeader" style="color:green;"></span>/<span id="totalQuestions"></span></p>
           </div>
           <div style="padding: 20px; display: flex; justify-content: between; align-items: center;">
             <div style="width:50%; color:green;">
-              <p style="margin-bottom: 15px;">0</p>
-              <P>Correct</P>
+              <p id="correctCount" style="margin-bottom: 15px;"></p>
+              <p>Correct</p>
             </div>
             <div style="width:50%; color: red;">
-              <p style="margin-bottom: 15px;">0</p>
+              <p id="wrongCount" style="margin-bottom: 15px;"></p>
               <p>Incorrect</p>
             </div>
           </div>
         </div>
 
         <div style="border: 1px solid gray; border-radius: 10px;">
-          <div style="display: flex; justify-content: space-between; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
+          <div style="background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
             <h3 style="margin:0px; background-color: #90c3dfff; border-radius: 10px 10px 0px 0px;">YOUR PERFORMANCE BY CATEGORY</h3>
-            <p style="margin:0px;"><span style="color:green;">0</span>/<span>75</span></p>
           </div>
           <div style="padding: 20px;">
             <div style="display:flex;align-items:center;gap:15px;background:#f8fafc;padding:15px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);max-width:400px;">
@@ -275,11 +269,111 @@ function renderStartExam() {
         </div>
       </div>
     `;
-  });
-  document.getElementById('startNowBtn').addEventListener('click', () => {
-    startMockExam();
-    fetchQuestions();
-  });
+
+    // Elements
+    const timeMode = document.getElementById('timeMode');
+    const examTableBody = document.getElementById('examTableBody');
+
+    // Format time ago
+    function timeAgo(date) {
+      const now = new Date();
+      const diff = Math.floor((now - new Date(date)) / 1000);
+
+      const minutes = Math.floor(diff / 60);
+      const hours = Math.floor(diff / 3600);
+      const days = Math.floor(diff / 86400);
+      const weeks = Math.floor(diff / 604800);
+      const months = Math.floor(diff / 2592000);
+      const years = Math.floor(diff / 31536000);
+
+      if (years > 0) return `${years} year${years > 1 ? 's' : ''} ago`;
+      if (months > 0) return `${months} month${months > 1 ? 's' : ''} ago`;
+      if (weeks > 0) return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+      if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+      if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+      return 'Just now';
+    }
+
+    function formatDuration(seconds) {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+
+      let result = '';
+      if (hrs > 0) result += `${hrs} Hours `;
+      if (mins > 0) result += `${mins} Minutes `;
+      result += `${secs} Seconds`;
+
+      return result.trim();
+    }
+
+    // Render table rows
+    function renderTable(mode = 'ago') {
+      examTableBody.innerHTML = '';
+
+      allExams.slice(0, 2).forEach(exam => {
+        const correctCount = exam.answers.filter(a => a.selectedOption === a.correctAnswer).length;
+        // const wrongCount = questions.length - correctCount;
+        
+        const row = document.createElement('tr');
+        const dateText = mode === 'ago'
+        ? timeAgo(exam.finishedAt)
+        : new Date(exam.finishedAt).toLocaleString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        row.innerHTML = `
+          <td>${dateText}</td>
+          <td>${correctCount}% ${(correctCount / questions.length) * 100  >= 75 ? '✅' : ''}</td>
+          <td>${formatDuration(exam.duration)}</td>
+        `;
+        examTableBody.appendChild(row);
+      });
+    }
+    timeMode.addEventListener('change', () => {
+      renderTable(timeMode.value);
+    });
+
+    // 🧾 Get last exam
+    const lastExam = allExams[allExams.length - 1];
+    console.log(lastExam);
+    if (lastExam) {
+      const correctCount = lastExam.answers.filter(q => q.selectedOption === q.correctAnswer).length;
+      const wrongCount = lastExam.answers.filter(q => q.selectedOption !== q.correctAnswer).length;
+      const percentage = Math.round((correctCount / questions.length) * 100);
+      console.log(percentage);
+      const circle = document.querySelector('.progress-circle');
+      const text = document.getElementById('percentageText');
+
+      // 🌀 Color based on percentage
+      let color = '#ef4444'; // red
+      if (percentage >= (questions.length / 100) * 75) color = '#22c55e'; // green
+      else if (percentage >= questions.length / 2) color = '#eab308'; // yellow
+
+      const degree = (percentage / 100) * 360;
+      circle.style.background = `conic-gradient(${color} ${degree}deg, #e5e7eb ${degree}deg)`;
+      text.textContent = `${percentage}%`;
+      document.getElementById('correctCountHeader').innerText = correctCount;
+      document.getElementById('correctCount').innerText = correctCount;
+      document.getElementById('wrongCount').innerText = wrongCount;
+      document.getElementById('totalQuestions').innerText = questions.length;
+    }
+
+    // Initial render
+    renderTable();
+    
+    document.getElementById('lastAttemp').innerHTML = `
+      ${timeAgo(lastExam.finishedAt)}
+    `;
+    document.getElementById('startNowBtn').addEventListener('click', () => {
+      startMockExam();
+      fetchQuestions();
+    });
 }
 
 let questions = [];
@@ -821,7 +915,10 @@ function submitExam() {
   console.log('✅ Exam submitted:', examData);
 
   renderStartExam();
-  sidebarBottom.innerHTML = `
+  fetchQuestions();
+
+  const sidebarContentBottom = document.getElementById('sidebarBottom');
+  sidebarContentBottom.innerHTML = `
     <h3>Mock Exam</h3>
     <h4 id="examName" style="margin-top:0px;"></h4>
   `;
