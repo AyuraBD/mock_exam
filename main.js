@@ -88,7 +88,6 @@ examDiv.innerHTML = `
   <h4 id="examName" style="margin-top:0px;"></h4>
 `;
 
-
 // const examDivHeading = document.createElement('h3');
 
 // const examName = document.createElement('h3');
@@ -153,14 +152,15 @@ startBtn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.1)';
 
 // When user clicks Start Exam button
 startBtn.addEventListener('click', () => {
-  const previousResult = JSON.parse(localStorage.getItem('mockExamResult'));
+  const previousResult = JSON.parse(localStorage.getItem('examResults'));
 
   if (previousResult) {
     // User has taken the exam before
     // renderPreviousResult(previousResult);
+    renderStartExam();
   } else {
     // No previous result — start fresh exam
-    renderStartExam();
+    startFirstExam();
   }
 });
 
@@ -168,95 +168,114 @@ main.appendChild(loadMockExam);
 loadMockExam.appendChild(startBtn);
 document.body.appendChild(main);
 
-function renderStartExam() {
+function startFirstExam(){
   main.innerHTML = `
-    <div style="padding-top:20px; padding-bottom: 20px;">
-      <div style="border-bottom:1px solid #050505; margin-bottom: 20px;">
-        <h2 style="margin: 0px; margin-bottom: 10px;">Your recent exam activity</h2>
-      </div>
-      <table style="width: 100%;" cellspacing="0" cellpadding="8">
-        <tr style="padding:20px; background-color: #90c3dfff;">
-          <th>
-            <select>
-              <option>How long ago?</option>
-              <option>When exactly?</option>
-            </select>
-          </th>
-          <th>Exam Score</th>
-          <th>Exam Duration</th>
-        </tr>
-        <tr>
-          <td>14 Hours ago</td>
-          <td>0%</td>
-          <td>5 Minues</td>
-        </tr>
-        <tr>
-          <td>4 months ago</td>
-          <td>76%</td>
-          <td>3 hours</td>
-        </tr>
-      </table>
+    <div>
+      <h2 style="border-bottom: 1px solid gray; padding-bottom:5px; font-weight:bold;">Results of your last exam</h2>
+      <p>Looks like it is your first time taking this exam. Your results will appear here after your first attemp.</p>
+      <button id="startFirstExam" style="border:none; background-color: blue; color:white; width:100%; padding:10px 0px;">Start Exam</button>
+    </div>
+    `;
 
-      <div style="border-bottom:1px solid #90c3dfff; margin-bottom: 20px;">
-        <h2 style="margin: 0px; margin-bottom: 10px;">Results of your last exam</h2>
-      </div>
-      <div style="border: 1px solid gray; border-radius: 10px; margin-bottom: 30px;">
-        <h3 style="margin:0px; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">YOUR LAST SCORE</h3>
-        <div style="padding: 20px; display: flex; justify-content: between; align-items: center;">
-          <div style="width:50%;">
-            <p>Score Diagram</p>
-          </div>
-          <div style="width:50%;">
-            <p style="margin-bottom: 15px;">To pass you need to reach 75%</p>
-            <button style="background-color: #1073a8ff; padding: 10px; border-radius: 10px;">Retake Exam</button>
-          </div>
-        </div>
-        <p>Last attempt: 14 hours ago</p>
-      </div>
+    document.getElementById('startFirstExam').addEventListener('click', ()=>{
+      startMockExam();
+      fetchQuestions();
+    });
+}
 
-      <div style="border: 1px solid gray; border-radius: 10px; margin-bottom:30px;">
-        <div style="display: flex; justify-content: space-between; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
-          <h3 style="margin:0px; background-color: #90c3dfff; border-radius: 10px 10px 0px 0px;">CORRECTLY ANSWERED</h3>
-          <p style="margin:0px;"><span style="color:green;">0</span>/<span>75</span></p>
+function renderStartExam() {
+  const allExams = JSON.parse(localStorage.getItem('examResults')) || [];
+  console.log(allExams);
+  allExams.forEach((exam, index) => {
+    const answered = exam.answers.filter(a => a.selectedOption !== null);
+    const totalQuestions = exam.answers.length;
+    const correctCount = exam.answers.filter(a => a.selectedOption === a.correctAnswer).length;
+    const percentage = totalQuestions ? Math.round((correctCount / totalQuestions) * 100) : 0;
+    console.log(answered, totalQuestions, correctCount, percentage);
+    main.innerHTML = `
+      <div style="padding-top:20px; padding-bottom: 20px;">
+        <div style="border-bottom:1px solid #050505; margin-bottom: 20px;">
+          <h2 style="margin: 0px; margin-bottom: 10px;">Your recent exam activity</h2>
         </div>
-        <div style="padding: 20px; display: flex; justify-content: between; align-items: center;">
-          <div style="width:50%; color:green;">
-            <p style="margin-bottom: 15px;">0</p>
-            <P>Correct</P>
-          </div>
-          <div style="width:50%; color: red;">
-            <p style="margin-bottom: 15px;">0</p>
-            <p>Incorrect</p>
-          </div>
-        </div>
-      </div>
+        <table style="width: 100%;" cellspacing="0" cellpadding="8">
+          <tr style="padding:20px; background-color: #90c3dfff;">
+            <th>
+              <select>
+                <option>How long ago?</option>
+                <option>When exactly?</option>
+              </select>
+            </th>
+            <th>Exam Score</th>
+            <th>Exam Duration</th>
+          </tr>
+          <tr>
+            <td>14 Hours ago</td>
+            <td>0%</td>
+            <td>5 Minues</td>
+          </tr>
+          <tr>
+            <td>4 months ago</td>
+            <td>76%</td>
+            <td>3 hours</td>
+          </tr>
+        </table>
 
-      <div style="border: 1px solid gray; border-radius: 10px;">
-        <div style="display: flex; justify-content: space-between; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
-          <h3 style="margin:0px; background-color: #90c3dfff; border-radius: 10px 10px 0px 0px;">YOUR PERFORMANCE BY CATEGORY</h3>
-          <p style="margin:0px;"><span style="color:green;">0</span>/<span>75</span></p>
+        <div style="border-bottom:1px solid #90c3dfff; margin-bottom: 20px;">
+          <h2 style="margin: 0px; margin-bottom: 10px;">Results of your last exam</h2>
         </div>
-        <div style="padding: 20px;">
-          <div style="display:flex;align-items:center;gap:15px;background:#f8fafc;padding:15px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);max-width:400px;">
-            <img 
-              src="https://via.placeholder.com/60" 
-              alt="Profile Picture" 
-              style="width:60px; height:60px; border-radius:50%; object-fit:cover;"
-            />
-            
-            <div style="flex:1; background:#e2e8f0; border-radius:10px; height:12px; overflow:hidden;">
-              <div style="height:100%;width:70%;background:#3b82f6;transition:width 0.3s ease;"></div>
+        <div style="border: 1px solid gray; border-radius: 10px; margin-bottom: 30px;">
+          <h3 style="margin:0px; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">YOUR LAST SCORE</h3>
+          <div style="padding: 20px; display: flex; justify-content: between; align-items: center;">
+            <div style="width:50%;">
+              <p>Score Diagram</p>
+            </div>
+            <div style="width:50%;">
+              <p style="margin-bottom: 15px;">To pass you need to reach 75%</p>
+              <button id="startNowBtn" style="background-color: #1073a8ff; padding: 10px; border-radius: 10px;">Retake Exam</button>
+            </div>
+          </div>
+          <p>Last attempt: 14 hours ago</p>
+        </div>
+
+        <div style="border: 1px solid gray; border-radius: 10px; margin-bottom:30px;">
+          <div style="display: flex; justify-content: space-between; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
+            <h3 style="margin:0px; background-color: #90c3dfff; border-radius: 10px 10px 0px 0px;">CORRECTLY ANSWERED</h3>
+            <p style="margin:0px;"><span style="color:green;">0</span>/<span>75</span></p>
+          </div>
+          <div style="padding: 20px; display: flex; justify-content: between; align-items: center;">
+            <div style="width:50%; color:green;">
+              <p style="margin-bottom: 15px;">0</p>
+              <P>Correct</P>
+            </div>
+            <div style="width:50%; color: red;">
+              <p style="margin-bottom: 15px;">0</p>
+              <p>Incorrect</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="border: 1px solid gray; border-radius: 10px;">
+          <div style="display: flex; justify-content: space-between; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
+            <h3 style="margin:0px; background-color: #90c3dfff; border-radius: 10px 10px 0px 0px;">YOUR PERFORMANCE BY CATEGORY</h3>
+            <p style="margin:0px;"><span style="color:green;">0</span>/<span>75</span></p>
+          </div>
+          <div style="padding: 20px;">
+            <div style="display:flex;align-items:center;gap:15px;background:#f8fafc;padding:15px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);max-width:400px;">
+              <img 
+                src="https://via.placeholder.com/60" 
+                alt="Profile Picture" 
+                style="width:60px; height:60px; border-radius:50%; object-fit:cover;"
+              />
+              
+              <div style="flex:1; background:#e2e8f0; border-radius:10px; height:12px; overflow:hidden;">
+                <div style="height:100%;width:70%;background:#3b82f6;transition:width 0.3s ease;"></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      
-      <button id="startNowBtn" style="padding:10px 20px;font-size:16px;background:#3B82F6;color:#fff;border:none;border-radius:8px;cursor:pointer;">
-        Start Now
-      </button>
-    </div>
-  `;
-  
+    `;
+  });
   document.getElementById('startNowBtn').addEventListener('click', () => {
     startMockExam();
     fetchQuestions();
@@ -734,7 +753,6 @@ function renderQuestion(index) {
     });
   });
 
-  console.log(selectedOptionAnswer);
 }
 
 
@@ -782,9 +800,6 @@ function updateAnswerProgress() {
   if(percentText) percentText.textContent = `${percent}% Answered or checked`;
 }
 
-
-
-
 function submitExam() {
   clearInterval(timerInterval);
 
@@ -804,8 +819,13 @@ function submitExam() {
   localStorage.setItem('examResults', JSON.stringify(allExams));
 
   console.log('✅ Exam submitted:', examData);
-}
 
+  renderStartExam();
+  sidebarBottom.innerHTML = `
+    <h3>Mock Exam</h3>
+    <h4 id="examName" style="margin-top:0px;"></h4>
+  `;
+}
 
 // function formatDuration(ms) {
 //   const totalSec = Math.floor(ms / 1000);
