@@ -5,6 +5,7 @@ document.body.style.display = "flex";
 document.body.style.height = "100vh";
 document.body.style.justifyContent = 'space-between';
 document.body.style.fontFamily = "sans-serif";
+document.body.style.overflow = "scroll";
 
 // === Sidebar ===
 const sidebar = document.createElement('div');
@@ -125,7 +126,8 @@ const main = document.createElement('div');
 main.id = 'main';
 main.style.flex = '1';
 main.style.width = '70%';
-main.style.background = '#F8FAFC';
+main.style.height = '100vh';
+main.style.overflow = 'scroll';
 main.style.display = 'flex';
 main.style.flexDirection = 'column';
 main.style.justifyContent = "space-between";
@@ -192,8 +194,8 @@ function renderStartExam() {
         <div style="border-bottom:1px solid #050505; margin-bottom: 20px;">
           <h2 style="margin: 0px; margin-bottom: 10px;">Your recent exam activity</h2>
         </div>
-        <table style="width: 100%;" cellspacing="0" cellpadding="8">
-          <thead>
+        <table style="width: 100%; margin-bottom:40px;" cellspacing="2" cellpadding="18">
+          <thead style="text-align:left;">
             <tr style="padding:20px; background-color: #90c3dfff;">
               <th>
                 <select id="timeMode">
@@ -215,35 +217,37 @@ function renderStartExam() {
         </div>
         <div style="border: 1px solid gray; border-radius: 10px; margin-bottom: 30px;">
           <h3 style="margin:0px; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">YOUR LAST SCORE</h3>
-          <div style="padding: 20px; display: flex; justify-content: between; align-items: center;">
+          <div style="display: flex; justify-content: between; align-items: center;">
             <div style="width:50%;">
               <div class="progress-container" style="display: flex; justify-content: center; align-items: center; padding: 20px;">
-                <div class="progress-circle" style="width: 120px; height: 120px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; color: #333; background: conic-gradient(#ccc 0deg, #ccc 360deg);">
+                <div class="progress-circle" style="width: 120px; height: 120px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; color: #333; background: conic-gradient(#ccc 0deg, #ccc 360deg); position: relative;">
                   <span id="percentageText" style="position: absolute;">0%</span>
                 </div>
               </div>
             </div>
             <div style="width:50%;">
-              <p style="margin-bottom: 15px;">To pass you need to reach 75%</p>
-              <button id="retakeExamBtn" style="background-color: #1073a8ff; padding: 10px; border-radius: 10px;">Retake Exam</button>
+              <div style="padding:20px;">
+                <p style="margin-bottom: 15px;">To pass you need to reach 75%</p>
+                <button id="retakeExamBtn" style="background-color: #1073a8ff; padding: 10px; border-radius: 10px;">Retake Exam</button>
+              </div>
             </div>
           </div>
-          <p>Last attempt: <span id="lastAttemp"></span></p>
+          <p style="padding:20px; margin:0px;">Last attempt: <span id="lastAttemp"></span></p>
         </div>
 
         <div style="border: 1px solid gray; border-radius: 10px; margin-bottom:30px;">
           <div style="display: flex; justify-content: space-between; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
             <h3 style="margin:0px; background-color: #90c3dfff; border-radius: 10px 10px 0px 0px;">CORRECTLY ANSWERED</h3>
-            <p style="margin:0px;"><span id="correctCountHeader" style="color:green;"></span>/<span id="totalQuestions"></span></p>
+            <p style="margin:0px; font-size:18px;"><span id="correctCountHeader" style="color:green;"></span>/<span id="totalQuestions"></span></p>
           </div>
-          <div style="padding: 20px; display: flex; justify-content: between; align-items: center;">
-            <div style="width:50%; color:green;">
-              <p id="correctCount" style="margin-bottom: 15px;"></p>
-              <p>Correct</p>
+          <div style="display: flex; justify-content: center; align-items: center;">
+            <div style="width:50%; color:green; padding: 20px; ">
+              <p id="correctCount" style="margin:0px; margin-bottom: 15px;  font-size:25px;"></p>
+              <p style="margin:0px;">Correct</p>
             </div>
-            <div style="width:50%; color: red;">
-              <p id="wrongCount" style="margin-bottom: 15px;"></p>
-              <p>Incorrect</p>
+            <div style="width:50%; color: red; padding: 20px; ">
+              <p id="wrongCount" style="margin:0px; margin-bottom: 15px; font-size:25px;"></p>
+              <p style="margin:0px;">Incorrect</p>
             </div>
           </div>
         </div>
@@ -957,8 +961,6 @@ function submitExam() {
   allExams.push(examData);
   localStorage.setItem('examResults', JSON.stringify(allExams));
 
-  console.log('✅ Exam submitted:', examData);
-
   renderStartExam();
   fetchQuestions();
 
@@ -967,6 +969,8 @@ function submitExam() {
     <h3>Mock Exam</h3>
     <h4 id="examName" style="margin-top:0px;"></h4>
   `;
+  examData = {};
+  totalTime = 0;
 }
 
 // function formatDuration(ms) {
