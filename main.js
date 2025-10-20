@@ -131,8 +131,6 @@ main.style.overflow = 'scroll';
 main.style.display = 'flex';
 main.style.flexDirection = 'column';
 main.style.justifyContent = "space-between";
-main.style.paddingLeft = '50px';
-main.style.paddingRight = '50px';
 
 const loadMockExam = document.createElement('div');
 loadMockExam.id = 'loadMockExam';
@@ -190,7 +188,7 @@ function renderStartExam() {
   const allExams = JSON.parse(localStorage.getItem('examResults')) || [];  
 
     main.innerHTML = `
-      <div style="padding-top:20px; padding-bottom: 20px;">
+      <div style="padding:20px 50px;">
         <div style="border-bottom:1px solid #050505; margin-bottom: 20px;">
           <h2 style="margin: 0px; margin-bottom: 10px;">Your recent exam activity</h2>
         </div>
@@ -611,7 +609,7 @@ function renderQuestion(index) {
   mainFooter.style.backgroundColor = "#d1cacaff";
   mainFooter.style.padding = '10px';
   mainFooter.style.display = "flex";
-  mainFooter.style.justifyContent = "space-between";
+  mainFooter.style.justifyContent = "space-around";
   mainFooter.innerHTML = `
     <button id="questionPrev" style="font-size:16px; background-color:transparent; border:none; color:black;">< Previous</button>
     <button id="questionNext" style="font-size:16px; background-color:transparent; border:none; color:black;">Next ></button>
@@ -637,7 +635,7 @@ function renderQuestion(index) {
 
 
   mainQuestions.innerHTML = `
-    <div>
+    <div style="padding:20px 50px;">
       <div style="margin-bottom:10px;">
         <h4 style="color:blue;">Patient (${q?.patient?.comment})</h4>
         <div style="display: flex; gap: 10px;">
@@ -646,9 +644,9 @@ function renderQuestion(index) {
           <button id="radioBtn" style="background-color:skyblue; color:white; border:none; padding: 10px; border-radius:5px;">Radiograph</button>
           <button id="profileBtn" style="background-color:skyblue; color:white; border:none; padding: 10px; border-radius:5px;">Profile</button>
         </div>
-        <div style="display:none;" id="imgWrapper">
+        <div style="display:none; overflow:hidden; width:100%; max-width:800px; position:relative;" id="imgWrapper">
           <h3 id="imgName"></h3>
-          <img id="patientImg" style="width:500px;" src="${q.patient.photo}" alt="patient" />
+          <img id="patientImg" style="width:90%; cursor:grab; transition: transform 0.3s ease; transform-origin: center center; position: relative;" src="${q.patient.photo}" alt="patient-image" />
         </div>
       </div>
 
@@ -674,6 +672,53 @@ function renderQuestion(index) {
       <div id="solutionDiv"></div>
     </div>
   `;
+
+  const patientImg = document.getElementById('patientImg');
+
+patientImg.addEventListener('click', () => {
+  // Create overlay
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100vw';
+  overlay.style.height = '100vh';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.zIndex = '9999';
+  overlay.style.padding = '10px'; // for small screens
+
+  // Clone image
+  const zoomedImg = patientImg.cloneNode(true);
+  zoomedImg.style.width = '100%';
+  zoomedImg.style.height = 'auto';
+  zoomedImg.style.maxWidth = '800px';
+  zoomedImg.style.maxHeight = '90vh';
+  zoomedImg.style.borderRadius = '10px';
+  zoomedImg.style.objectFit = 'contain';
+  zoomedImg.style.cursor = 'zoom-out';
+  zoomedImg.style.transition = 'transform 0.3s ease';
+  zoomedImg.style.transform = 'scale(1.02)';
+  zoomedImg.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
+
+  overlay.appendChild(zoomedImg);
+  document.body.appendChild(overlay);
+
+  // Remove zoom on click
+  overlay.addEventListener('click', () => {
+    document.body.removeChild(overlay);
+  });
+
+  // Optional: prevent scroll behind overlay
+  document.body.style.overflow = 'hidden';
+  overlay.addEventListener('click', () => {
+    document.body.style.overflow = '';
+  });
+});
+
+
 
   // Restore previously selected answer if any and update it
   const answered = selectedOptionAnswer.find(option => option.id === q.qid);
