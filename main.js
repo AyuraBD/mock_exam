@@ -228,7 +228,7 @@ function renderStartExam() {
             <div style="width:50%;">
               <div style="padding:20px;">
                 <p style="margin-bottom: 15px;">To pass you need to reach 75%</p>
-                <button id="retakeExamBtn" style="background-color: #1073a8ff; padding: 10px; border-radius: 10px;">Retake Exam</button>
+                <button id="retakeExamBtn" style="background-color: #1073a8ff; padding: 10px 20px; border-radius: 10px; color:white; font-size:16px;border:none;">Retake Exam</button>
               </div>
             </div>
           </div>
@@ -410,7 +410,16 @@ function renderStartExam() {
     }
     console.log(categoryStats);
 
-    document.getElementById('retakeExamBtn').addEventListener('click', () => {
+    const retakeExamBtn = document.getElementById('retakeExamBtn');
+    retakeExamBtn.style.cursor = 'pointer';
+    retakeExamBtn.addEventListener('mouseover', ()=>{
+      retakeExamBtn.style.backgroundColor = '#f1da2aff'
+    })
+    retakeExamBtn.addEventListener('mouseout', ()=>{
+      retakeExamBtn.style.backgroundColor = '#1073a8ff'
+    })
+
+    retakeExamBtn.addEventListener('click', () => {
       startMockExam();
       fetchQuestions();
     });
@@ -467,7 +476,7 @@ async function startMockExam() {
           <p style="margin:0px; font-size:18px;">Time left: </p>
           <div id="timer" style="font-size:18px;font-weight:bold;color:#1E40AF;"></div>
         </div>
-        <button id="submitExamBtn" style="width:100%;padding:12px 8px;background:skyblue;color:white;border:none;border-radius:6px; margin:auto;">Submit Exam</button>
+        <button id="submitExamBtn" style="width:100%;padding:12px 8px;background:#1073a8ff;color:white;border:none;border-radius:6px; margin:auto;">Submit Exam</button>
       </div>
       <div id="questionIndexDiv" style="padding: 15px; box-shadow: 2px 0px 20px 0px; border-radius:10px;">
       </div>
@@ -480,7 +489,17 @@ async function startMockExam() {
   renderQuestion(currentQuestionIndex);
   renderSidebarBottom();
   startTimer();
-  document.getElementById('submitExamBtn').addEventListener('click', submitExam);
+  
+  const submitExamBtn = document.getElementById('submitExamBtn');
+  submitExamBtn.style.cursor = 'pointer';
+  submitExamBtn.addEventListener('mouseover', ()=>{
+    submitExamBtn.style.backgroundColor = '#f1da2aff'
+  })
+  submitExamBtn.addEventListener('mouseout', ()=>{
+    submitExamBtn.style.backgroundColor = '#1073a8ff'
+  })
+  submitExamBtn.addEventListener('click', submitExam);
+  
 }
 
 // Start timer to tract exam time counting
@@ -517,13 +536,21 @@ function renderSidebarBottom() {
     btn.textContent = idx + 1;
     btn.style.width = '40px';
     btn.style.height = '35px';
-    btn.style.border = '1px solid #ddd';
-    btn.style.background = idx === currentQuestionIndex ? '#edce32ff' : 'skyblue';
+    btn.style.border = 'none';
+    btn.style.background = idx === currentQuestionIndex ? '#f1da2aff' : '#1073a8ff';
     btn.style.color = idx === currentQuestionIndex ? '#fff' : '#fff';
     btn.addEventListener('click', () => {
       currentQuestionIndex = idx;
       renderQuestion(currentQuestionIndex);
       renderSidebarBottom(); // re-render to update active color    
+    });
+    btn.addEventListener('mouseover', () => {
+      btn.style.boxShadow = '2px 5px 10px 0px rgba(0, 0, 0, 0.3)';
+      btn.style.cursor = 'pointer';
+    });
+
+    btn.addEventListener('mouseout', () => {
+      btn.style.boxShadow = 'none';
     });
     indexContainer.appendChild(btn);
 
@@ -574,24 +601,40 @@ function renderQuestion(index) {
   mainHeader.style.display = "flex";
   mainHeader.style.justifyContent = "end";
   mainHeader.innerHTML = `
-    <button id="checkBtn" style="background-color: blue; border:none; color:white; padding: 10px; border-radius: 5px; margin-right: 10px;">Check</button>
-    <button id="flagBtn" style="border: 1px solid gray; padding: 7px 10px; border-radius:5px; border-left: 7px solid gray;">Flag for later review</button>
+    <button id="checkBtn" style="background-color: #1073a8ff; border:none; color:white; padding: 10px; border-radius: 5px; margin-right: 10px;">Check</button>
+    <button id="flagBtn" style="color:gray; border: 1px solid gray; padding: 7px 10px; border-radius:5px; border-left: 7px solid gray;">Flag for later review</button>
   `;
   const mainQuestions = document.createElement('div');
   mainQuestions.id = "mainQuestions";
   const mainFooter = document.createElement('div');
   mainFooter.id = "mainFooter";
-  mainFooter.style.backgroundColor = "#d4ecf0";
+  mainFooter.style.backgroundColor = "#d1cacaff";
   mainFooter.style.padding = '10px';
   mainFooter.style.display = "flex";
   mainFooter.style.justifyContent = "space-between";
   mainFooter.innerHTML = `
-    <button id="questionPrev" style="background-color:transparent; border:none;">Previous</button>
-    <button id="questionNext" style="background-color:transparent; border:none;">Next</button>
+    <button id="questionPrev" style="font-size:16px; background-color:transparent; border:none; color:black;">< Previous</button>
+    <button id="questionNext" style="font-size:16px; background-color:transparent; border:none; color:black;">Next ></button>
   `;
   main.appendChild(mainHeader);
   main.appendChild(mainQuestions);
   main.appendChild(mainFooter);
+
+  const checkBtn = document.getElementById('checkBtn');
+  checkBtn.addEventListener('mouseover', ()=>{
+    checkBtn.style.backgroundColor = '#f1da2aff';
+    checkBtn.style.cursor = 'pointer';
+  })
+  checkBtn.addEventListener('mouseout', ()=>{
+    checkBtn.style.backgroundColor = '#1073a8ff'
+  })
+  document.getElementById('flagBtn').addEventListener('mouseover', ()=>{
+    document.getElementById('flagBtn').style.color = 'black';
+  })
+  document.getElementById('flagBtn').addEventListener('mouseout', ()=>{
+    document.getElementById('flagBtn').style.color = 'gray';
+  })
+
 
   mainQuestions.innerHTML = `
     <div>
@@ -765,6 +808,20 @@ function renderQuestion(index) {
   // 📝 Navigation Buttons
   const prevBtn = document.getElementById('questionPrev');
   const nextBtn = document.getElementById('questionNext');
+  prevBtn.addEventListener('mouseover', ()=>{
+    prevBtn.style.color = '#1073a8ff';
+    prevBtn.style.cursor = 'pointer';
+  })
+  prevBtn.addEventListener('mouseout', ()=>{
+    prevBtn.style.color = 'black';
+  })
+  nextBtn.addEventListener('mouseover', ()=>{
+    nextBtn.style.color = '#1073a8ff';
+    nextBtn.style.cursor = 'pointer';
+  })
+  nextBtn.addEventListener('mouseout', ()=>{
+    nextBtn.style.color = 'black';
+  })
   prevBtn.addEventListener('click', ()=>{
     if(currentQuestionIndex > 0){
       main.innerHTML = '';
