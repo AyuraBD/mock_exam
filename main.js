@@ -1,10 +1,14 @@
+const link = document.createElement('link');
+link.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap';
+link.rel = 'stylesheet';
+document.head.appendChild(link);
+
 // Reset body style
 document.body.style.margin = "0";
 document.body.style.position = "relative";
 document.body.style.display = "flex";
 document.body.style.height = "100vh";
 document.body.style.justifyContent = 'space-between';
-document.body.style.fontFamily = "sans-serif";
 document.body.style.overflow = "scroll";
 
 // === Sidebar ===
@@ -21,6 +25,7 @@ sidebar.style.overflow = "scroll";
 
 // === Top section ===
 const topSection = document.createElement('div');
+topSection.id = 'sidebarTop';
 topSection.style.background = '#3B82F6';  // blue color
 topSection.style.padding = '15px';
 topSection.style.display = 'flex';
@@ -42,6 +47,7 @@ backBtn.style.padding = '10px';
 backBtn.style.borderRadius = '6px';
 backBtn.style.cursor = 'pointer';
 backBtn.style.fontSize = '14px';
+backBtn.style.fontFamily = "'Noto Sans', sans-serif";
 
 // Toggle Button
 const toggleBtn = document.createElement('button');
@@ -55,13 +61,14 @@ toggleBtn.style.cursor = 'pointer';
 toggleBtn.style.fontSize = '14px';
 
 // "Mock Exam" Label
-const mockLabel = document.createElement('div');
+const mockLabel = document.createElement('h2');
 mockLabel.textContent = 'NBDHE - Mock Exam';
 mockLabel.style.color = 'white';
 mockLabel.style.fontSize = '18px';
 mockLabel.style.fontWeight = 'bold';
 mockLabel.style.paddingTop = '30px';
 mockLabel.style.paddingBottom = '30px';
+mockLabel.style.fontFamily = "'Kagins', sans-serif";
 
 topSection.appendChild(buttonDiv);
 topSection.appendChild(backBtn);
@@ -85,8 +92,8 @@ bottomSection.style.color = '#334155';
 const examDiv = document.createElement('div');
 examDiv.id = "examDiv";
 examDiv.innerHTML = `
-  <h3>Mock Exam</h3>
-  <h4 id="examName" style="margin-top:0px;"></h4>
+  <h3 style="font-family: 'Noto Sans', sans-serif;">Mock Exam</h3>
+  <h4 id="examName" style="margin-top:0px; font-family: 'Noto Sans', sans-serif;"></h4>
 `;
 
 // const examDivHeading = document.createElement('h3');
@@ -149,6 +156,7 @@ startBtn.style.border = 'none';
 startBtn.style.borderRadius = '8px';
 startBtn.style.cursor = 'pointer';
 startBtn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.1)';
+startBtn.style.fontFamily = "'Noto Sans', sans-serif";
 
 // When user clicks Start Exam button
 startBtn.addEventListener('click', () => {
@@ -190,9 +198,9 @@ function renderStartExam() {
     main.innerHTML = `
       <div style="padding:20px 50px;">
         <div style="border-bottom:1px solid #050505; margin-bottom: 20px;">
-          <h2 style="margin: 0px; margin-bottom: 10px;">Your recent exam activity</h2>
+          <h2 style="margin: 0px; margin-bottom: 10px; font-family: 'Kagins', sans-serif;">Your recent exam activity</h2>
         </div>
-        <table style="width: 100%; margin-bottom:40px;" cellspacing="2" cellpadding="18">
+        <table style="width: 100%; margin-bottom:40px; font-family: 'Noto Sans', sans-serif;" cellspacing="2" cellpadding="18">
           <thead style="text-align:left;">
             <tr style="padding:20px; background-color: #90c3dfff;">
               <th>
@@ -211,11 +219,11 @@ function renderStartExam() {
         </table>
 
         <div style="border-bottom:1px solid #90c3dfff; margin-bottom: 20px;">
-          <h2 style="margin: 0px; margin-bottom: 10px;">Results of your last exam</h2>
+          <h2 style="margin: 0px; margin-bottom: 10px; font-family: 'Kagins', sans-serif;">Results of your last exam</h2>
         </div>
         <div style="border: 1px solid gray; border-radius: 10px; margin-bottom: 30px;">
-          <h3 style="margin:0px; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">YOUR LAST SCORE</h3>
-          <div style="display: flex; justify-content: between; align-items: center;">
+          <h3 style="font-family: 'Kagins', sans-serif; margin:0px; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">YOUR LAST SCORE</h3>
+          <div style="font-family: 'Noto Sans', sans-serif; display: flex; justify-content: between; align-items: center;">
             <div style="width:50%;">
               <div class="progress-container" style="display: flex; justify-content: center; align-items: center; padding: 20px;">
                 <div class="progress-circle" style="width: 120px; height: 120px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; color: #333; background: conic-gradient(#ccc 0deg, #ccc 360deg); position: relative;">
@@ -230,31 +238,31 @@ function renderStartExam() {
               </div>
             </div>
           </div>
-          <p style="padding:20px; margin:0px;">Last attempt: <span id="lastAttemp"></span></p>
+          <p style="font-family: 'Noto Sans', sans-serif; padding:20px; margin:0px;">Last attempt: <span id="lastAttemp"></span></p>
         </div>
 
         <div style="border: 1px solid gray; border-radius: 10px; margin-bottom:30px;">
-          <div style="display: flex; justify-content: space-between; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
+          <div style="font-family: 'Kagins', sans-serif; display: flex; justify-content: space-between; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
             <h3 style="margin:0px; background-color: #90c3dfff; border-radius: 10px 10px 0px 0px;">CORRECTLY ANSWERED</h3>
             <p style="margin:0px; font-size:18px;"><span id="correctCountHeader" style="color:green;"></span>/<span id="totalQuestions"></span></p>
           </div>
-          <div style="display: flex; justify-content: center; align-items: center;">
+          <div style="font-family: 'Noto Sans', sans-serif; font-weight: 500; display: flex; justify-content: center; align-items: center;">
             <div style="width:50%; color:green; padding: 20px; ">
-              <p id="correctCount" style="margin:0px; margin-bottom: 15px;  font-size:25px;"></p>
+              <p id="correctCount" style="margin:0px; margin-bottom: 10px;  font-size:25px;"></p>
               <p style="margin:0px;">Correct</p>
             </div>
             <div style="width:50%; color: red; padding: 20px; ">
-              <p id="wrongCount" style="margin:0px; margin-bottom: 15px; font-size:25px;"></p>
+              <p id="wrongCount" style="margin:0px; margin-bottom: 10px; font-size:25px;"></p>
               <p style="margin:0px;">Incorrect</p>
             </div>
           </div>
         </div>
 
         <div style="border: 1px solid gray; border-radius: 10px;">
-          <div style="background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
+          <div style="font-family: 'Kagins', sans-serif; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
             <h3 style="margin:0px; background-color: #90c3dfff; border-radius: 10px 10px 0px 0px;">YOUR PERFORMANCE BY CATEGORY</h3>
           </div>
-          <div id="performanceBody" style="padding: 20px;">
+          <div id="performanceBody" style="font-family: 'Noto Sans', sans-serif; padding: 20px;">
 
           </div>
         </div>
@@ -463,20 +471,20 @@ async function startMockExam() {
   sidebarBottom.innerHTML = `
     <div style="padding:10px;">
       <div id="questionHead" style="padding: 15px; box-shadow: 2px 0px 20px 0px; border-radius:10px; margin-bottom: 20px;">
-        <h2 id="examName" style="margin-top:0px;"></h2>
-        <div id="answerProgressWrapper" style="margin-bottom: 20px; position: relative; width: 100%; height: 25px; background-color: #868484ff; border-radius: 5px; overflow: hidden; margin-top: 10px;">
+        <h2 id="examName" style="margin-top:0px; font-family: 'Kagins', sans-serif;"></h2>
+        <div id="answerProgressWrapper" style="font-family: 'Noto Sans', sans-serif; margin-bottom: 20px; position: relative; width: 100%; height: 25px; background-color: #868484ff; border-radius: 5px; overflow: hidden; margin-top: 10px;">
           <div id="answerProgressBar" style="height: 100%; width: 0%; background-color: #4caf50; transition: width 0.3s ease;"></div>
           <p id="answerPercent" style="color:white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0; font-weight: bold; width:100%; text-align:center;">
             0% Answered or checked
           </p>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom:20px;">
+        <div style="font-family:'Noto Sans', sans-serif; display: flex; justify-content: space-between; margin-bottom:20px;">
           <p style="margin:0px; font-size:18px;">Time left: </p>
           <div id="timer" style="font-size:18px;font-weight:bold;color:#1E40AF;"></div>
         </div>
-        <button id="submitExamBtn" style="width:100%;padding:12px 8px;background:#1073a8ff;color:white;border:none;border-radius:6px; margin:auto;">Submit Exam</button>
+        <button id="submitExamBtn" style="font-family: 'Noto Sans', sans-serif; width:100%;padding:12px 8px;background:#1073a8ff;color:white;border:none;border-radius:6px; margin:auto;">Submit Exam</button>
       </div>
-      <div id="questionIndexDiv" style="padding: 15px; box-shadow: 2px 0px 20px 0px; border-radius:10px;">
+      <div id="questionIndexDiv" style="font-family: 'Noto Sans', sans-serif; padding: 15px; box-shadow: 2px 0px 20px 0px; border-radius:10px;">
       </div>
     </div>
   `
@@ -598,9 +606,10 @@ function renderQuestion(index) {
   mainHeader.style.padding = '10px';
   mainHeader.style.display = "flex";
   mainHeader.style.justifyContent = "end";
+  
   mainHeader.innerHTML = `
-    <button id="checkBtn" style="background-color: #1073a8ff; border:none; color:white; padding: 10px; border-radius: 5px; margin-right: 10px;">Check</button>
-    <button id="flagBtn" style="color:gray; border: 1px solid gray; padding: 7px 10px; border-radius:5px; border-left: 7px solid gray;">Flag for later review</button>
+    <button id="checkBtn" style="font-family: 'Noto Sans', sans-serif; background-color: #1073a8ff; border:none; color:white; padding: 10px; border-radius: 5px; margin-right: 10px;">Check</button>
+    <button id="flagBtn" style="font-family: 'Noto Sans', sans-serif; color:gray; border: 1px solid gray; padding: 7px 10px; border-radius:5px; border-left: 7px solid gray;">Flag for later review</button>
   `;
   const mainQuestions = document.createElement('div');
   mainQuestions.id = "mainQuestions";
@@ -611,8 +620,8 @@ function renderQuestion(index) {
   mainFooter.style.display = "flex";
   mainFooter.style.justifyContent = "space-around";
   mainFooter.innerHTML = `
-    <button id="questionPrev" style="font-size:16px; background-color:transparent; border:none; color:black;">< Previous</button>
-    <button id="questionNext" style="font-size:16px; background-color:transparent; border:none; color:black;">Next ></button>
+    <button id="questionPrev" style="font-family: 'Noto Sans', sans-serif; font-size:16px; background-color:transparent; border:none; color:black;">< Previous</button>
+    <button id="questionNext" style="font-family: 'Noto Sans', sans-serif; font-size:16px; background-color:transparent; border:none; color:black;">Next ></button>
   `;
   main.appendChild(mainHeader);
   main.appendChild(mainQuestions);
@@ -637,24 +646,24 @@ function renderQuestion(index) {
   mainQuestions.innerHTML = `
     <div style="padding:20px 50px;">
       <div style="margin-bottom:10px;">
-        <h4 style="color:blue;">Patient (${q?.patient?.comment})</h4>
-        <div style="display: flex; gap: 10px;">
+        <h4 style="color:blue; font-family: 'Noto Sans', sans-serif;">Patient (${q?.patient?.comment})</h4>
+        <div style="font-family: 'Noto Sans', sans-serif; display: flex; gap: 10px;">
           <button id="photoBtn" style="background-color:skyblue; color:white; border:none; padding: 10px; border-radius:5px;">Photo</button>
           <button id="chartBtn" style="background-color:skyblue; color:white; border:none; padding: 10px; border-radius:5px;">Chart</button>
           <button id="radioBtn" style="background-color:skyblue; color:white; border:none; padding: 10px; border-radius:5px;">Radiograph</button>
           <button id="profileBtn" style="background-color:skyblue; color:white; border:none; padding: 10px; border-radius:5px;">Profile</button>
         </div>
-        <div style="display:none; overflow:hidden; width:100%; max-width:800px; position:relative;" id="imgWrapper">
+        <div style="font-family: 'Noto Sans', sans-serif; display:none; overflow:hidden; width:100%; max-width:800px;" id="imgWrapper">
           <h3 id="imgName"></h3>
-          <img id="patientImg" style="width:90%; cursor:grab; transition: transform 0.3s ease; transform-origin: center center; position: relative;" src="${q.patient.photo}" alt="patient-image" />
+          <img id="patientImg" style="width:90%; cursor:pointer; transition: transform 0.3s ease; transform-origin: center center;" src="${q.patient.photo}" alt="patient-image" />
         </div>
       </div>
 
       <div style="display:flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin:0px;">${q.text}</h3>
-        <p style="display: flex; color: gray; margin:0px;">Question <span> [${index +1}]</span></p>
+        <h3 style="margin:0px; font-family: 'Kagins', sans-serif;">${q.text}</h3>
+        <p style="font-family: 'Noto Sans', sans-serif; display: flex; color: gray; margin:0px;">Question<span>[${index+1}]</span></p>
       </div>
-      <div id="answersDiv">
+      <div id="answersDiv" style="font-family: 'Noto Sans', sans-serif;">
         <ul style="list-style: none; padding: 0px;">
           ${q.items.map(
               (item, index) => `
@@ -1069,7 +1078,7 @@ function submitExam() {
   const sidebarContentBottom = document.getElementById('sidebarBottom');
   sidebarContentBottom.innerHTML = `
     <h3>Mock Exam</h3>
-    <h4 id="examName" style="margin-top:0px;"></h4>
+    <h4 id="examName" style="margin-top:0px; font-family: 'Kagins', sans-serif;"></h4>
   `;
   examData = {};
   totalTime = 0;

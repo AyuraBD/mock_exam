@@ -1,0 +1,11 @@
+@font-face {
+  font-family: 'Kagins';
+  src: url('assets/fonts/kagis-font/kagis.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+'Noto Sans', sans-serif
+'Kagins', sans-serif;
+
