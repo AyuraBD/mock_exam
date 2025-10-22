@@ -1,7 +1,3 @@
-const link = document.createElement('link');
-link.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap';
-link.rel = 'stylesheet';
-document.head.appendChild(link);
 
 // Reset body style
 document.body.style.margin = "0";
@@ -16,17 +12,17 @@ const sidebar = document.createElement('div');
 sidebar.id = 'sidebar';
 sidebar.style.left = "0";
 sidebar.style.top = "0";
-sidebar.style.width = '30%';
-sidebar.style.background = '#FFFFFF';
+sidebar.style.width = '400px';
+sidebar.style.backgroundColor = '#ffffff';
 sidebar.style.boxShadow = '2px 0 10px rgba(0,0,0,0.1)';
 sidebar.style.transition = 'width 0.3s';
 sidebar.style.height = '100vh';
-sidebar.style.overflow = "scroll";
+sidebar.style.overflow = "auto";
 
 // === Top section ===
 const topSection = document.createElement('div');
 topSection.id = 'sidebarTop';
-topSection.style.background = '#3B82F6';  // blue color
+topSection.style.background = 'var(--color-primary-light)';  // blue color
 topSection.style.padding = '15px';
 topSection.style.display = 'flex';
 topSection.style.flexDirection = 'column';
@@ -40,7 +36,7 @@ buttonDiv.style.justifyContent = 'space-between';
 // Dashboard Button
 const backBtn = document.createElement('button');
 backBtn.textContent = '< Back to Dashboard';
-backBtn.style.background = '#2563EB';
+backBtn.style.background = 'var(--color-primary)';
 backBtn.style.color = '#fff';
 backBtn.style.border = 'none';
 backBtn.style.padding = '10px';
@@ -49,16 +45,57 @@ backBtn.style.cursor = 'pointer';
 backBtn.style.fontSize = '14px';
 backBtn.style.fontFamily = "'Noto Sans', sans-serif";
 
-// Toggle Button
-const toggleBtn = document.createElement('button');
-toggleBtn.textContent = '⏪';
-toggleBtn.style.background = '#1E40AF';
-toggleBtn.style.color = '#fff';
-toggleBtn.style.border = 'none';
-toggleBtn.style.padding = '10px';
-toggleBtn.style.borderRadius = '6px';
-toggleBtn.style.cursor = 'pointer';
-toggleBtn.style.fontSize = '14px';
+
+
+
+// Inside Toggle Button (to collapse)
+const collapseBtn = document.createElement('button');
+collapseBtn.textContent = '⏪';
+collapseBtn.style.background = 'var(--color-primary)';
+collapseBtn.style.color = '#fff';
+collapseBtn.style.border = 'none';
+collapseBtn.style.padding = '10px';
+collapseBtn.style.borderRadius = '6px';
+collapseBtn.style.cursor = 'pointer';
+collapseBtn.style.fontSize = '14px';
+
+// Outside Toggle Button (to expand)
+const expandBtn = document.createElement('button');
+expandBtn.id = 'expandBtn';
+expandBtn.textContent = '⏩';
+expandBtn.style.background = 'var(--color-primary)';
+expandBtn.style.color = '#fff';
+expandBtn.style.border = 'none';
+expandBtn.style.padding = '10px';
+expandBtn.style.borderRadius = '6px';
+expandBtn.style.cursor = 'pointer';
+expandBtn.style.fontSize = '14px';
+
+// Position expand button outside the sidebar
+expandBtn.style.position = 'fixed';
+expandBtn.style.left = '10px';
+expandBtn.style.top = '8px';
+expandBtn.style.display = 'none';
+
+document.body.appendChild(expandBtn);
+// Collapse sidebar
+collapseBtn.addEventListener('click', () => {
+  sidebar.classList.remove('sidebar-expanded');
+  sidebar.classList.add('sidebar-collapsed');
+  collapseBtn.style.display = 'none';
+  expandBtn.style.display = 'block';
+});
+
+// Expand sidebar
+expandBtn.addEventListener('click', () => {
+  sidebar.classList.remove('sidebar-collapsed');
+  sidebar.classList.add('sidebar-expanded');
+  collapseBtn.style.display = 'block';
+  expandBtn.style.display = 'none';
+});
+
+
+
 
 // "Mock Exam" Label
 const mockLabel = document.createElement('h2');
@@ -71,12 +108,9 @@ mockLabel.style.paddingBottom = '30px';
 mockLabel.style.fontFamily = "'Kagins', sans-serif";
 
 topSection.appendChild(buttonDiv);
-topSection.appendChild(backBtn);
-topSection.appendChild(toggleBtn);
 topSection.appendChild(mockLabel);
-
 buttonDiv.appendChild(backBtn);
-buttonDiv.appendChild(toggleBtn);
+buttonDiv.appendChild(collapseBtn);
 
 // === Sidebar bottom
 const bottomSection = document.createElement('div');
@@ -86,14 +120,14 @@ bottomSection.style.paddingTop = '20px';
 
 bottomSection.style.fontSize = '16px';
 bottomSection.style.fontWeight = '500';
-bottomSection.style.color = '#334155';
+bottomSection.style.color = 'var(--color-text)';
 
 // Dynamic exam name 
 const examDiv = document.createElement('div');
 examDiv.id = "examDiv";
 examDiv.innerHTML = `
-  <h3 style="font-family: 'Noto Sans', sans-serif;">Mock Exam</h3>
-  <h4 id="examName" style="margin-top:0px; font-family: 'Noto Sans', sans-serif;"></h4>
+  <h3 style="font-family: var(--font-headings);">Mock Exam</h3>
+  <h4 id="examName" style="margin-top:0px; font-family: var(--font-headings);"></h4>
 `;
 
 // const examDivHeading = document.createElement('h3');
@@ -103,25 +137,25 @@ examDiv.innerHTML = `
 bottomSection.appendChild(examDiv);
 
 // toggle sidebar
-toggleBtn.addEventListener('click', () => {
-  const isExpanded = sidebar.style.width === '30%';
+// toggleBtn.addEventListener('click', () => {
+//   const isExpanded = sidebar.style.width === '30%';
 
-  if (isExpanded) {
-    sidebar.style.width = '3%';
-    topSection.style.padding = "0px";
-    backBtn.style.display = 'none';
-    mockLabel.style.display = 'none';
-    bottomSection.style.display = 'none';
-    toggleBtn.textContent = '⏩';
-  } else {
-    sidebar.style.width = '30%';
-    topSection.style.padding = "15px";
-    backBtn.style.display = 'block';
-    mockLabel.style.display = 'block';
-    bottomSection.style.display = 'block';
-    toggleBtn.textContent = '⏪';
-  }
-});
+//   if (isExpanded) {
+//     sidebar.style.width = '3%';
+//     topSection.style.padding = "0px";
+//     backBtn.style.display = 'none';
+//     mockLabel.style.display = 'none';
+//     bottomSection.style.display = 'none';
+//     toggleBtn.textContent = '⏩';
+//   } else {
+//     sidebar.style.width = '30%';
+//     topSection.style.padding = "15px";
+//     backBtn.style.display = 'block';
+//     mockLabel.style.display = 'block';
+//     bottomSection.style.display = 'block';
+//     toggleBtn.textContent = '⏪';
+//   }
+// });
 
 // Append
 sidebar.appendChild(topSection);
@@ -150,13 +184,13 @@ const startBtn = document.createElement('button');
 startBtn.textContent = 'Load Mock Exam';
 startBtn.style.padding = '15px 30px';
 startBtn.style.fontSize = '18px';
-startBtn.style.background = '#3B82F6';
+startBtn.style.background = 'var(--color-primary)';
 startBtn.style.color = '#fff';
 startBtn.style.border = 'none';
 startBtn.style.borderRadius = '8px';
 startBtn.style.cursor = 'pointer';
 startBtn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.1)';
-startBtn.style.fontFamily = "'Noto Sans', sans-serif";
+startBtn.style.fontFamily = "var(--font-mainText)";
 
 // When user clicks Start Exam button
 startBtn.addEventListener('click', () => {
@@ -178,10 +212,10 @@ document.body.appendChild(main);
 
 function startFirstExam(){
   main.innerHTML = `
-    <div>
-      <h2 style="border-bottom: 1px solid gray; padding-bottom:5px; font-weight:bold;">Results of your last exam</h2>
-      <p>Looks like it is your first time taking this exam. Your results will appear here after your first attemp.</p>
-      <button id="startFirstExam" style="border:none; background-color: blue; color:white; width:100%; padding:10px 0px;">Start Exam</button>
+    <div id="firstExamDiv" style="padding: 60px;">
+      <h2 style="border-bottom: 1px solid gray; padding-bottom:5px; font-weight:bold; font-family: var(--font-headings)">Results of your last exam</h2>
+      <p style="font-family: var(--font-mainText)">Looks like it is your first time taking this exam. Your results will appear here after your first attemp.</p>
+      <button id="startFirstExam" style="border:none; background-color: var(--color-primary); color:white; width:100%; padding:10px 0px; cursor: pointer;">Start Exam</button>
     </div>
     `;
 
@@ -196,13 +230,13 @@ function renderStartExam() {
   const allExams = JSON.parse(localStorage.getItem('examResults')) || [];  
 
     main.innerHTML = `
-      <div style="padding:20px 50px;">
+      <div id="recentActivity" style="padding:60px 50px;">
         <div style="border-bottom:1px solid #050505; margin-bottom: 20px;">
-          <h2 style="margin: 0px; margin-bottom: 10px; font-family: 'Kagins', sans-serif;">Your recent exam activity</h2>
+          <h2 style="margin: 0px; margin-bottom: 10px; font-family: var(--font-headings);">Your recent exam activity</h2>
         </div>
-        <table style="width: 100%; margin-bottom:40px; font-family: 'Noto Sans', sans-serif;" cellspacing="2" cellpadding="18">
+        <table style="width: 100%; margin-bottom:30px; font-family: var(--font-mainText);" cellspacing="2" cellpadding="12">
           <thead style="text-align:left;">
-            <tr style="padding:20px; background-color: #90c3dfff;">
+            <tr style="padding:15px 10px; background-color: var(--color-primary-light)">
               <th>
                 <select id="timeMode">
                   <option value="ago">How long ago?</option>
@@ -218,12 +252,12 @@ function renderStartExam() {
           </tbody>
         </table>
 
-        <div style="border-bottom:1px solid #90c3dfff; margin-bottom: 20px;">
-          <h2 style="margin: 0px; margin-bottom: 10px; font-family: 'Kagins', sans-serif;">Results of your last exam</h2>
+        <div style="border-bottom:1px solid #050505; margin-bottom: 20px;">
+          <h2 style="margin: 0px; margin-bottom: 10px; font-family: var(--font-headings);">Results of your last exam</h2>
         </div>
         <div style="border: 1px solid gray; border-radius: 10px; margin-bottom: 30px;">
-          <h3 style="font-family: 'Kagins', sans-serif; margin:0px; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">YOUR LAST SCORE</h3>
-          <div style="font-family: 'Noto Sans', sans-serif; display: flex; justify-content: between; align-items: center;">
+          <h3 style="font-family: var(--font-headings); margin:0px; background-color: var(--color-primary-light); padding: 15px; border-radius: 10px 10px 0px 0px;">YOUR LAST SCORE</h3>
+          <div style="font-family: var(--font-mainText); display: flex; justify-content: between; align-items: center;">
             <div style="width:50%;">
               <div class="progress-container" style="display: flex; justify-content: center; align-items: center; padding: 20px;">
                 <div class="progress-circle" style="width: 120px; height: 120px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold; color: #333; background: conic-gradient(#ccc 0deg, #ccc 360deg); position: relative;">
@@ -234,19 +268,19 @@ function renderStartExam() {
             <div style="width:50%;">
               <div style="padding:20px;">
                 <p style="margin-bottom: 15px;">To pass you need to reach 75%</p>
-                <button id="retakeExamBtn" style="background-color: #1073a8ff; padding: 10px 20px; border-radius: 10px; color:white; font-size:16px;border:none;">Retake Exam</button>
+                <button id="retakeExamBtn" style="background-color: var(--color-primary); padding: 10px 20px; border-radius: 5px; color:white; font-size:16px;border:none;">Retake Exam</button>
               </div>
             </div>
           </div>
-          <p style="font-family: 'Noto Sans', sans-serif; padding:20px; margin:0px;">Last attempt: <span id="lastAttemp"></span></p>
+          <p style="font-family: var(--font-mainText); padding:20px; margin:0px;">Last attempt: <span id="lastAttemp"></span></p>
         </div>
 
         <div style="border: 1px solid gray; border-radius: 10px; margin-bottom:30px;">
-          <div style="font-family: 'Kagins', sans-serif; display: flex; justify-content: space-between; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
-            <h3 style="margin:0px; background-color: #90c3dfff; border-radius: 10px 10px 0px 0px;">CORRECTLY ANSWERED</h3>
+          <div style="font-family: var(--font-headings); display: flex; justify-content: space-between; background-color: var(--color-primary-light); padding: 15px; border-radius: 10px 10px 0px 0px;">
+            <h3 style="margin:0px; border-radius: 10px 10px 0px 0px;">CORRECTLY ANSWERED</h3>
             <p style="margin:0px; font-size:18px;"><span id="correctCountHeader" style="color:green;"></span>/<span id="totalQuestions"></span></p>
           </div>
-          <div style="font-family: 'Noto Sans', sans-serif; font-weight: 500; display: flex; justify-content: center; align-items: center;">
+          <div style="font-family: var(--font-mainText); font-weight: 500; display: flex; justify-content: center; align-items: center;">
             <div style="width:50%; color:green; padding: 20px; ">
               <p id="correctCount" style="margin:0px; margin-bottom: 10px;  font-size:25px;"></p>
               <p style="margin:0px;">Correct</p>
@@ -259,10 +293,10 @@ function renderStartExam() {
         </div>
 
         <div style="border: 1px solid gray; border-radius: 10px;">
-          <div style="font-family: 'Kagins', sans-serif; background-color: #90c3dfff; padding: 15px; border-radius: 10px 10px 0px 0px;">
-            <h3 style="margin:0px; background-color: #90c3dfff; border-radius: 10px 10px 0px 0px;">YOUR PERFORMANCE BY CATEGORY</h3>
+          <div style="font-family: var(--font-headings); background-color: var(--color-primary-light); padding: 15px; border-radius: 10px 10px 0px 0px;">
+            <h3 style="margin:0px; border-radius: 10px 10px 0px 0px;">YOUR PERFORMANCE BY CATEGORY</h3>
           </div>
-          <div id="performanceBody" style="font-family: 'Noto Sans', sans-serif; padding: 20px;">
+          <div id="performanceBody" style="font-family: var(--font-mainText); padding: 20px;">
 
           </div>
         </div>
@@ -342,7 +376,6 @@ function renderStartExam() {
 
     // 🧾 Get last exam
     const lastExam = allExams[allExams.length - 1];
-    console.log(lastExam);
     if (lastExam) {
       const correctCount = lastExam.answers.filter(q => q.selectedOption === q.correctAnswer).length;
       const wrongCount = lastExam.answers.filter(q => q.selectedOption !== q.correctAnswer).length;
@@ -386,7 +419,6 @@ function renderStartExam() {
     for(const category in categoryStats){
       const stats = categoryStats[category];
       const percent = (Math.floor((stats.correct / stats.total) * 100));
-      console.log(`${category}: ${percent}`);
 
       const performanceBody = document.getElementById('performanceBody');
       const performanceSingle = document.createElement('div');
@@ -414,15 +446,14 @@ function renderStartExam() {
       `;
       performanceBody.appendChild(performanceSingle);
     }
-    console.log(categoryStats);
 
     const retakeExamBtn = document.getElementById('retakeExamBtn');
     retakeExamBtn.style.cursor = 'pointer';
     retakeExamBtn.addEventListener('mouseover', ()=>{
-      retakeExamBtn.style.backgroundColor = '#f1da2aff'
+      retakeExamBtn.style.backgroundColor = 'var(--color-secondary)'
     })
     retakeExamBtn.addEventListener('mouseout', ()=>{
-      retakeExamBtn.style.backgroundColor = '#1073a8ff'
+      retakeExamBtn.style.backgroundColor = 'var(--color-primary)'
     })
 
     retakeExamBtn.addEventListener('click', () => {
@@ -471,20 +502,20 @@ async function startMockExam() {
   sidebarBottom.innerHTML = `
     <div style="padding:10px;">
       <div id="questionHead" style="padding: 15px; box-shadow: 2px 0px 20px 0px; border-radius:10px; margin-bottom: 20px;">
-        <h2 id="examName" style="margin-top:0px; font-family: 'Kagins', sans-serif;"></h2>
-        <div id="answerProgressWrapper" style="font-family: 'Noto Sans', sans-serif; margin-bottom: 20px; position: relative; width: 100%; height: 25px; background-color: #868484ff; border-radius: 5px; overflow: hidden; margin-top: 10px;">
+        <h2 id="examName" style="margin-top:0px; font-family: var(--font-headings);"></h2>
+        <div id="answerProgressWrapper" style="font-family: var(--font-mainText); margin-bottom: 20px; position: relative; width: 100%; height: 25px; background-color: #868484ff; border-radius: 5px; overflow: hidden; margin-top: 10px;">
           <div id="answerProgressBar" style="height: 100%; width: 0%; background-color: #4caf50; transition: width 0.3s ease;"></div>
           <p id="answerPercent" style="color:white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0; font-weight: bold; width:100%; text-align:center;">
             0% Answered or checked
           </p>
         </div>
-        <div style="font-family:'Noto Sans', sans-serif; display: flex; justify-content: space-between; margin-bottom:20px;">
+        <div style="font-family:var(--font-mainText); display: flex; justify-content: space-between; margin-bottom:20px;">
           <p style="margin:0px; font-size:18px;">Time left: </p>
-          <div id="timer" style="font-size:18px;font-weight:bold;color:#1E40AF;"></div>
+          <div id="timer" style="font-size:18px;font-weight:bold; color: var(--color-primary)"></div>
         </div>
-        <button id="submitExamBtn" style="font-family: 'Noto Sans', sans-serif; width:100%;padding:12px 8px;background:#1073a8ff;color:white;border:none;border-radius:6px; margin:auto;">Submit Exam</button>
+        <button id="submitExamBtn" style="font-family: var(--font-mainText); width:100%;padding:12px 8px;background:var(--color-primary);color:white;border:none;border-radius:6px; margin:auto;">Submit Exam</button>
       </div>
-      <div id="questionIndexDiv" style="font-family: 'Noto Sans', sans-serif; padding: 15px; box-shadow: 2px 0px 20px 0px; border-radius:10px;">
+      <div id="questionIndexDiv" style="font-family: var(--font-mainText); padding: 15px; box-shadow: 2px 0px 20px 0px; border-radius:10px;">
       </div>
     </div>
   `
@@ -499,10 +530,10 @@ async function startMockExam() {
   const submitExamBtn = document.getElementById('submitExamBtn');
   submitExamBtn.style.cursor = 'pointer';
   submitExamBtn.addEventListener('mouseover', ()=>{
-    submitExamBtn.style.backgroundColor = '#f1da2aff'
+    submitExamBtn.style.backgroundColor = 'var(--color-secondary)'
   })
   submitExamBtn.addEventListener('mouseout', ()=>{
-    submitExamBtn.style.backgroundColor = '#1073a8ff'
+    submitExamBtn.style.backgroundColor = 'var(--color-primary)'
   })
   submitExamBtn.addEventListener('click', submitExam);
   
@@ -543,7 +574,7 @@ function renderSidebarBottom() {
     btn.style.width = '40px';
     btn.style.height = '35px';
     btn.style.border = 'none';
-    btn.style.background = idx === currentQuestionIndex ? '#f1da2aff' : '#1073a8ff';
+    btn.style.background = idx === currentQuestionIndex ? 'var(--color-secondary)' : 'var(--color-primary)';
     btn.style.color = idx === currentQuestionIndex ? '#fff' : '#fff';
     btn.addEventListener('click', () => {
       currentQuestionIndex = idx;
@@ -574,7 +605,7 @@ function renderSidebarBottom() {
       }
     });
     if(idx === currentQuestionIndex){
-      btn.style.background = '#edce32ff';
+      btn.style.background = 'var(--color-secondary)';
       btn.style.color = 'white';
     }
   });
@@ -602,26 +633,34 @@ function renderQuestion(index) {
 
   const mainHeader = document.createElement('div');
   mainHeader.id = "mainHeader";
-  mainHeader.style.backgroundColor = "#d4ecf0";
+  mainHeader.style.backgroundColor = "var(--color-primary-light)";
   mainHeader.style.padding = '10px';
   mainHeader.style.display = "flex";
   mainHeader.style.justifyContent = "end";
+  // mainHeader.style.position = 'fixed';
+  // mainHeader.style.top = '0';
+  // mainHeader.style.width = '100%';
+  // mainHeader.style.boxShadow = '0 0 10px 0';
   
   mainHeader.innerHTML = `
-    <button id="checkBtn" style="font-family: 'Noto Sans', sans-serif; background-color: #1073a8ff; border:none; color:white; padding: 10px; border-radius: 5px; margin-right: 10px;">Check</button>
-    <button id="flagBtn" style="font-family: 'Noto Sans', sans-serif; color:gray; border: 1px solid gray; padding: 7px 10px; border-radius:5px; border-left: 7px solid gray;">Flag for later review</button>
+    <button id="checkBtn" style="font-family: var(--font-mainText); background-color: var(--color-primary); border:none; color:white; padding: 10px; border-radius: 5px; margin-right: 10px;">Check</button>
+    <button id="flagBtn" style="font-family: var(--font-mainText); color:gray; border: 1px solid gray; padding: 7px 10px; border-radius:5px; border-left: 7px solid gray;">Flag for later review</button>
   `;
   const mainQuestions = document.createElement('div');
   mainQuestions.id = "mainQuestions";
   const mainFooter = document.createElement('div');
   mainFooter.id = "mainFooter";
-  mainFooter.style.backgroundColor = "#d1cacaff";
+  mainFooter.style.backgroundColor = "var(--color-bg)";
   mainFooter.style.padding = '10px';
   mainFooter.style.display = "flex";
   mainFooter.style.justifyContent = "space-around";
+  // mainFooter.style.position = 'fixed';
+  // mainFooter.style.bottom = '0';
+  // mainFooter.style.width = '100%';
+  // mainFooter.style.boxShadow = '0 0 10px 0';
   mainFooter.innerHTML = `
-    <button id="questionPrev" style="font-family: 'Noto Sans', sans-serif; font-size:16px; background-color:transparent; border:none; color:black;">< Previous</button>
-    <button id="questionNext" style="font-family: 'Noto Sans', sans-serif; font-size:16px; background-color:transparent; border:none; color:black;">Next ></button>
+    <button id="questionPrev" style="font-family: var(--font-mainText); font-size:16px; background-color:transparent; border:none; color:black;">< Previous</button>
+    <button id="questionNext" style="font-family: var(--font-mainText); font-size:16px; background-color:transparent; border:none; color:black;">Next ></button>
   `;
   main.appendChild(mainHeader);
   main.appendChild(mainQuestions);
@@ -629,11 +668,11 @@ function renderQuestion(index) {
 
   const checkBtn = document.getElementById('checkBtn');
   checkBtn.addEventListener('mouseover', ()=>{
-    checkBtn.style.backgroundColor = '#f1da2aff';
+    checkBtn.style.backgroundColor = 'var(--color-secondary)';
     checkBtn.style.cursor = 'pointer';
   })
   checkBtn.addEventListener('mouseout', ()=>{
-    checkBtn.style.backgroundColor = '#1073a8ff'
+    checkBtn.style.backgroundColor = 'var(--color-primary)'
   })
   document.getElementById('flagBtn').addEventListener('mouseover', ()=>{
     document.getElementById('flagBtn').style.color = 'black';
@@ -644,26 +683,26 @@ function renderQuestion(index) {
 
 
   mainQuestions.innerHTML = `
-    <div style="padding:20px 50px;">
+    <div id="mainQuestionsWrapper" style="padding:20px 50px;">
       <div style="margin-bottom:10px;">
-        <h4 style="color:blue; font-family: 'Noto Sans', sans-serif;">Patient (${q?.patient?.comment})</h4>
-        <div style="font-family: 'Noto Sans', sans-serif; display: flex; gap: 10px;">
-          <button id="photoBtn" style="background-color:skyblue; color:white; border:none; padding: 10px; border-radius:5px;">Photo</button>
-          <button id="chartBtn" style="background-color:skyblue; color:white; border:none; padding: 10px; border-radius:5px;">Chart</button>
-          <button id="radioBtn" style="background-color:skyblue; color:white; border:none; padding: 10px; border-radius:5px;">Radiograph</button>
-          <button id="profileBtn" style="background-color:skyblue; color:white; border:none; padding: 10px; border-radius:5px;">Profile</button>
+        <h4 style="color:var(--color-primary); font-family: var(--font-mainText);">Patient (${q?.patient?.comment ? q?.patient?.comment : 'Case not found'})</h4>
+        <div id="tabButtons" style="font-family: var(--font-mainText); border-bottom: 2px solid var(--color-primary); margin-bottom: 10px; display: flex; gap: 10px;">
+          <button id="photoBtn" class="tab-btn active">Photo</button>
+          <button id="chartBtn" class="tab-btn">Chart</button>
+          <button id="radioBtn" class="tab-btn">Radiograph</button>
+          <button id="profileBtn" class="tab-btn">Profile</button>
         </div>
-        <div style="font-family: 'Noto Sans', sans-serif; display:none; overflow:hidden; width:100%; max-width:800px;" id="imgWrapper">
+        <div id="imgWrapper" style="font-family: var(--font-mainText); display:none; overflow:hidden; width:100%; max-width:800px;">
           <h3 id="imgName"></h3>
-          <img id="patientImg" style="width:90%; cursor:pointer; transition: transform 0.3s ease; transform-origin: center center;" src="${q.patient.photo}" alt="patient-image" />
+          <img id="patientImg" style="width: 90%; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.3s ease; transform-origin: center center;" src="${q?.patient?.photo}" alt="patient-image" />
         </div>
       </div>
 
       <div style="display:flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin:0px; font-family: 'Kagins', sans-serif;">${q.text}</h3>
-        <p style="font-family: 'Noto Sans', sans-serif; display: flex; color: gray; margin:0px;">Question<span>[${index+1}]</span></p>
+        <h3 style="margin:0px; font-family: var(--font-headings);">${q.text}</h3>
+        <p style="font-family: var(--font-mainText); display: flex; color: gray; margin:0px;">Question<span>[${index+1}]</span></p>
       </div>
-      <div id="answersDiv" style="font-family: 'Noto Sans', sans-serif;">
+      <div id="answersDiv" style="font-family: var(--font-mainText);">
         <ul style="list-style: none; padding: 0px;">
           ${q.items.map(
               (item, index) => `
@@ -682,51 +721,136 @@ function renderQuestion(index) {
     </div>
   `;
 
+  // Tab buttons
+  const style = document.createElement('style');
+  style.innerHTML = `
+    .tab-btn {
+      background-color: var(--color-primary-light);
+      color: var(--color-primary);
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px 10px 0 0;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .tab-btn:hover {
+      background-color: var(--color-primary);
+      color:white;
+    }
+    .tab-btn.active {
+      background-color: var(--color-primary);
+      color: white;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Question's Image
+  const img = document.getElementById('patientImg');
+  const imgWrapper = document.getElementById('imgWrapper');
+  const imgName = document.getElementById('imgName');
+
+  const buttons = [
+    { id: 'photoBtn', key: 'photo' },
+    { id: 'chartBtn', key: 'chart' },
+    { id: 'radioBtn', key: 'radiogram' },
+    { id: 'profileBtn', key: 'profile' }
+  ];
+
+  // Filter out missing images
+  const availableTabs = buttons.filter(btn => q?.patient?.[btn.key]);
+  buttons.forEach(btn => {
+    const btnEl = document.getElementById(btn.id);
+    if (!q?.patient?.[btn.key]) {
+      btnEl.style.display = 'none'; // hide it if no image
+    }
+  });
+
+  // Update active tab UI
+  function setActiveTab(activeId) {
+    buttons.forEach(b => {
+      const btnEl = document.getElementById(b.id);
+      if (btnEl) btnEl.classList.toggle('active', b.id === activeId);
+    });
+  }
+
+  // Show image for selected tab
+  function showImage(btn) {
+    const imgSrc = q?.patient?.[btn.key];
+    if (imgSrc) {
+      img.src = imgSrc;
+      imgWrapper.style.display = 'block';
+      imgName.innerText = btn.key;
+      setActiveTab(btn.id);
+    } else {
+      imgWrapper.style.display = 'none';
+    }
+  }
+
+  // For available tabs
+  availableTabs.forEach(btn => {
+    document.getElementById(btn.id).addEventListener('click', () => showImage(btn));
+  });
+
+  // Show first available tab by default
+  if (availableTabs.length > 0) {
+    showImage(availableTabs[0]);
+  } else {
+    imgWrapper.style.display = 'none';
+  }
+
+  // Show first available tab dynamically
+  if (availableTabs.length > 0) {
+    showImage(availableTabs[0]); // first existing image
+  } else {
+    imgWrapper.style.display = 'none'; // hide wrapper if no images exist
+  }
+
+  // Zoom image on Click
   const patientImg = document.getElementById('patientImg');
+  patientImg.addEventListener('click', () => {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.zIndex = '9999';
+    overlay.style.padding = '10px'; // for small screens
 
-patientImg.addEventListener('click', () => {
-  // Create overlay
-  const overlay = document.createElement('div');
-  overlay.style.position = 'fixed';
-  overlay.style.top = '0';
-  overlay.style.left = '0';
-  overlay.style.width = '100vw';
-  overlay.style.height = '100vh';
-  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
-  overlay.style.display = 'flex';
-  overlay.style.justifyContent = 'center';
-  overlay.style.alignItems = 'center';
-  overlay.style.zIndex = '9999';
-  overlay.style.padding = '10px'; // for small screens
+    // Clone image
+    const zoomedImg = patientImg.cloneNode(true);
+    zoomedImg.style.width = '100%';
+    zoomedImg.style.height = 'auto';
+    zoomedImg.style.maxWidth = '800px';
+    zoomedImg.style.maxHeight = '90vh';
+    zoomedImg.style.borderRadius = '10px';
+    zoomedImg.style.objectFit = 'contain';
+    zoomedImg.style.cursor = 'zoom-out';
+    zoomedImg.style.transition = 'transform 0.3s ease';
+    zoomedImg.style.transform = 'scale(1.02)';
+    zoomedImg.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
 
-  // Clone image
-  const zoomedImg = patientImg.cloneNode(true);
-  zoomedImg.style.width = '100%';
-  zoomedImg.style.height = 'auto';
-  zoomedImg.style.maxWidth = '800px';
-  zoomedImg.style.maxHeight = '90vh';
-  zoomedImg.style.borderRadius = '10px';
-  zoomedImg.style.objectFit = 'contain';
-  zoomedImg.style.cursor = 'zoom-out';
-  zoomedImg.style.transition = 'transform 0.3s ease';
-  zoomedImg.style.transform = 'scale(1.02)';
-  zoomedImg.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
+    overlay.appendChild(zoomedImg);
+    document.body.appendChild(overlay);
 
-  overlay.appendChild(zoomedImg);
-  document.body.appendChild(overlay);
+    // Remove zoom on click
+    overlay.addEventListener('click', () => {
+      document.body.removeChild(overlay);
+    });
 
-  // Remove zoom on click
-  overlay.addEventListener('click', () => {
-    document.body.removeChild(overlay);
+    // Optional: prevent scroll behind overlay
+    document.body.style.overflow = 'hidden';
+    overlay.addEventListener('click', () => {
+      document.body.style.overflow = '';
+    });
   });
-
-  // Optional: prevent scroll behind overlay
-  document.body.style.overflow = 'hidden';
-  overlay.addEventListener('click', () => {
-    document.body.style.overflow = '';
-  });
-});
-
 
 
   // Restore previously selected answer if any and update it
@@ -737,25 +861,6 @@ patientImg.addEventListener('click', () => {
     );
     if (savedInput) savedInput.checked = true;
   }
-
-  // Question's Image
-  const img = document.getElementById('patientImg');
-  const imgWrapper = document.getElementById('imgWrapper');
-  const imgName = document.getElementById('imgName');
-    const buttons = [
-      { id: 'photoBtn', key: 'photo' },
-      { id: 'chartBtn', key: 'chart' },
-      { id: 'radioBtn', key: 'radiogram' },
-      { id: 'profileBtn', key: 'profile' }
-    ];
-
-    buttons.forEach(btn => {
-      document.getElementById(btn.id).addEventListener('click', () => {
-        img.src = q.patient[btn.key];
-        imgWrapper.style.display = "block";
-        imgName.innerText = btn.key;
-      });
-    });
 
   // ✅ Check Answer
   document.getElementById('checkBtn').addEventListener('click', () => {
@@ -863,14 +968,14 @@ patientImg.addEventListener('click', () => {
   const prevBtn = document.getElementById('questionPrev');
   const nextBtn = document.getElementById('questionNext');
   prevBtn.addEventListener('mouseover', ()=>{
-    prevBtn.style.color = '#1073a8ff';
+    prevBtn.style.color = 'var(--color-primary)';
     prevBtn.style.cursor = 'pointer';
   })
   prevBtn.addEventListener('mouseout', ()=>{
     prevBtn.style.color = 'black';
   })
   nextBtn.addEventListener('mouseover', ()=>{
-    nextBtn.style.color = '#1073a8ff';
+    nextBtn.style.color = 'var(--color-primary)';
     nextBtn.style.cursor = 'pointer';
   })
   nextBtn.addEventListener('mouseout', ()=>{
@@ -950,36 +1055,20 @@ patientImg.addEventListener('click', () => {
     const solutionDiv = document.getElementById('solutionDiv');
     if (answeredOption.selectedOption === answeredOption.correctAnswer) {
       solutionDiv.innerHTML = `
-        <div id="correct" style="background-color: #c0eddbff; padding: 20px;">
+        <div id="correct" style="background-color: #a8e9cfff; padding: 20px;">
           <h3>Correct</h3>
           ${q.solution_html}
         </div>
       `;
     } else {
       solutionDiv.innerHTML = `
-        <div id="incorrect" style="background-color: #ec8856ff; padding: 20px;">
+        <div id="incorrect" style="background-color: #f5a076ff; padding: 20px;">
           <h3>Incorrect</h3>
           ${q.solution_html}
         </div>
       `;
     }
   }
-  // user selects an option
-  // const selected = document.querySelector(`input[name="answer-${q.qid}"]:checked`);
-  // if(selected){
-  //   const existingIndex = selectedOptionAnswer.findIndex(opt => opt.id === q.qid);
-  //   if(existingIndex !== -1){
-  //     selectedOptionAnswer[existingIndex].selectedOption = selected.value;
-  //   } else {
-  //     selectedOptionAnswer.push({
-  //       id: q.qid,
-  //       selectedOption: selected.value,
-  //       correctAnswer: q.correct_answer,
-  //       category: q.category
-  //     });
-  //   }
-  // }
-  // console.log('selected',selectedOptionAnswer);
 
   // Get merged answers of two arrays to show on UI
   const answeredQ = getMergedAnswers().find(ans => ans.id === q.qid);
@@ -1008,18 +1097,6 @@ patientImg.addEventListener('click', () => {
   });
 
 }
-
-
-// if (flaggedQuestions.includes(q.id)) {
-//   btn.style.background = '#facc15'; // yellow for flagged
-// }
-// if (answers[q.id]) { 
-//   btn.style.background = '#16a34a'; // green for answered
-// }
-// if (idx === currentQuestionIndex) {
-//   btn.style.background = '#3B82F6'; // blue for active
-//   btn.style.color = '#fff';
-// }
 
 // Get merged answers of arrays
 function getMergedAnswers() {
@@ -1078,7 +1155,7 @@ function submitExam() {
   const sidebarContentBottom = document.getElementById('sidebarBottom');
   sidebarContentBottom.innerHTML = `
     <h3>Mock Exam</h3>
-    <h4 id="examName" style="margin-top:0px; font-family: 'Kagins', sans-serif;"></h4>
+    <h4 id="examName" style="margin-top:0px; font-family: var(--font-headings);"></h4>
   `;
   examData = {};
   totalTime = 0;
@@ -1092,8 +1169,89 @@ function submitExam() {
 // }
 
 
+// === Handle responsive default state ===
+function handleSidebarResponsiveness() {
+  if (window.innerWidth <= 768) {
+    // small screen → start collapsed
+    sidebar.classList.add('sidebar-collapsed');
+    sidebar.classList.remove('sidebar-expanded');
+    expandBtn.style.display = 'block';
+    collapseBtn.style.display = 'none';
+  } else {
+    // large screen → start expanded
+    sidebar.classList.add('sidebar-expanded');
+    sidebar.classList.remove('sidebar-collapsed');
+    expandBtn.style.display = 'none';
+    collapseBtn.style.display = 'block';
+  }
+}
 
+// Call on load + resize
+window.addEventListener('load', handleSidebarResponsiveness);
+window.addEventListener('resize', handleSidebarResponsiveness);
 
+// === Inject Styles ===
+const style = document.createElement('style');
+style.innerHTML = `
+  /* === Import Google Font === */
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
+  :root {
+    /* === Brand Colors === */
+    --color-primary: #800080;    /* purple */
+    --color-primary-light: #D996D9; /* purple light */
+    --color-secondary: #FF3F7F;
+    --color-bg: #eed6eeff;
+    --color-text: #111827;
 
+    /* === Font Settings === */
+    --font-headings: 'Kagins', sans-serif;
+    --font-mainText: 'Noto Sans', sans-serif;
+  }
 
+  #sidebar {
+    position: relative;
+    transition: width 0.3s ease;
+  }
+
+  .sidebar-expanded {
+    width: 400px !important;
+  }
+
+  .sidebar-collapsed {
+    width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  @media (max-width: 768px) {
+    #sidebar {
+      position: absolute;
+      z-index: 9999;
+      height: 100vh;
+      top: 0;
+      left: 0;
+      background: #fff;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+    }
+
+    #firstExamDiv {
+      padding: 60px 15px!important;
+    }
+
+    #expandBtn {
+      display: block;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 10000;
+    }
+    #recentActivity{
+      padding: 60px 15px!important;
+    }
+
+    #mainQuestionsWrapper {
+      padding: 20px 15px !important;
+    }
+  }
+`;
+document.head.appendChild(style);
