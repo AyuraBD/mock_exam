@@ -489,8 +489,8 @@ function renderStartExam() {
             <p>${category}</p>
             <p>${percent} %</p>
           </div>
-          <div style="flex:1; background:#e2e8f0; border-radius:10px; height:12px; overflow:hidden;">
-            <div style="height:100%;width:${percent}%;background:#3b82f6;transition:width 0.3s ease;"></div>
+          <div style="flex:1; background: var(--color-bg); border-radius:10px; height:12px; overflow:hidden;">
+            <div style="height:100%;width:${percent}%;background: var(--color-primary);transition:width 0.3s ease;"></div>
           </div>
         </div>
       `;
@@ -540,7 +540,6 @@ let examData = {
       document.getElementById('examName').textContent = data?.result?.name;
       questions = data?.result?.questions ?? [];
       result = data?.result;
-      console.log(result,questions);
       totalTime = data?.result?.duration_seconds;
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -557,8 +556,8 @@ async function startMockExam() {
     <div style="padding:10px;">
       <div id="questionHead" style="padding: 15px; box-shadow: 2px 0px 20px 0px; border-radius:10px; margin-bottom: 20px;">
         <h2 id="examName" style="margin-top:0px; font-family: var(--font-headings);"></h2>
-        <div id="answerProgressWrapper" style="font-family: var(--font-mainText); margin-bottom: 20px; position: relative; width: 100%; height: 25px; background-color: #868484ff; border-radius: 5px; overflow: hidden; margin-top: 10px;">
-          <div id="answerProgressBar" style="height: 100%; width: 0%; background-color: #4caf50; transition: width 0.3s ease;"></div>
+        <div id="answerProgressWrapper" style="font-family: var(--font-mainText); margin-bottom: 20px; position: relative; width: 100%; height: 30px; background-color: var(--color-bg); border-radius: 5px; overflow: hidden; margin-top: 10px;">
+          <div id="answerProgressBar" style="height: 100%; width: 0%; background-color: var(--color-primary); transition: width 0.3s ease;"></div>
           <p id="answerPercent" style="color:white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0; font-weight: bold; width:100%; text-align:center;">
             0% Answered or checked
           </p>
@@ -761,7 +760,7 @@ function renderQuestion(index) {
           ${q.items.map(
               (item, index) => `
                 <li style="padding: 10px;">
-                  <label id="optionLabel" style="padding: 10px;">
+                  <label id="optionLabel" class="optionLabel" style="padding: 10px;">
                     <input type="radio" name="answer-${q.qid}" value="${item}" id="option-${q.qid}-${index}">
                     ${item}
                   </label>
@@ -791,6 +790,16 @@ function renderQuestion(index) {
     .tab-btn:hover {
       background-color: var(--color-primary);
       color:white;
+    }
+    .optionLabel{
+      cursor:pointer;
+      transition: all 0.3s ease;
+    }
+    .optionLabel:hover{
+      background-color:var(--color-bg);
+      padding: 10px 20px;
+      border-radius: 5px;
+      transition: all 0.3s ease;
     }
     .tab-btn.active {
       background-color: var(--color-primary);
@@ -1007,7 +1016,6 @@ function renderQuestion(index) {
     }
     renderSidebarBottom(); // highlight flagged
     renderQuestion(currentQuestionIndex);
-    console.log(flaggedQuestions);
   });
 
   const flagBtn = document.getElementById('flagBtn');
