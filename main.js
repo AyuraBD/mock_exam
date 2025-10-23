@@ -1,4 +1,3 @@
-
 // Reset body style
 document.body.style.margin = "0";
 document.body.style.position = "relative";
@@ -194,17 +193,68 @@ startBtn.style.fontFamily = "var(--font-mainText)";
 
 // When user clicks Start Exam button
 startBtn.addEventListener('click', () => {
-  const previousResult = JSON.parse(localStorage.getItem('examResults'));
+  showLoader('Loading your exam scores and achievements...');
 
-  if (previousResult) {
+  setTimeout(()=>{
+    const previousResult = JSON.parse(localStorage.getItem('examResults'));
+    hideLoader();
+    
+    if (previousResult) {
     // User has taken the exam before
-    // renderPreviousResult(previousResult);
-    renderStartExam();
-  } else {
-    // No previous result — start fresh exam
-    startFirstExam();
-  }
+      renderStartExam();
+    } else {
+      // No previous result — start fresh exam
+      startFirstExam();
+    }
+  },1000);
 });
+
+
+// Loader
+function showLoader (message){
+  if(document.getElementById('globalLoader')) return;
+  const loader = document.createElement('div');
+  loader.id = 'globalLoader';
+  loader.innerHTML = `
+    <div style="
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(255,255,255,0.9);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 99999;
+      font-family: 'Noto Sans', sans-serif;
+      color: var(--color-primary);
+    ">
+      <div style="
+        width: 60px; height: 60px;
+        border: 6px solid #ccc;
+        border-top: 6px solid var(--color-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 15px;
+      "></div>
+      <p style="font-size: 16px; font-weight: 500;">${message}</p>
+    </div>
+  `;
+  document.body.appendChild(loader);
+}
+// Remove loader 
+function hideLoader (){
+  const loader = document.getElementById('globalLoader');
+  if(loader) loader.remove();
+}
+// Add animation keyframes
+const loaderStyle = document.createElement('style');
+loaderStyle.innerHTML = `
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+`;
+document.head.appendChild(loaderStyle);
+
 
 main.appendChild(loadMockExam);
 loadMockExam.appendChild(startBtn);
@@ -481,17 +531,21 @@ let examData = {
 
   // Function to fetch questions from API
   async function fetchQuestions() {
+    showLoader("Loading exam questions...");
+
     try {
       const response = await fetch('https://6b3kct08il.execute-api.us-east-1.amazonaws.com/qa//exams/bpa?respectOrder=1');
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      document.getElementById('examName').textContent = data.result.name;
-      questions = data.result?.questions ?? [];
-      result = data.result;
+      document.getElementById('examName').textContent = data?.result?.name;
+      questions = data?.result?.questions ?? [];
+      result = data?.result;
       console.log(result,questions);
       totalTime = data?.result?.duration_seconds;
     } catch (error) {
       console.error("Error fetching questions:", error);
+    }finally{
+      hideLoader();
     }
   }
 fetchQuestions();
@@ -1131,7 +1185,8 @@ function updateAnswerProgress() {
   if(percentText) percentText.textContent = `${percent}% Answered or checked`;
 }
 
-function submitExam() {
+async function submitExam() {
+  showLoader('Your exam is submitting...')
   clearInterval(timerInterval);
 
   examData.finishedAt = new Date().toISOString();
@@ -1150,7 +1205,7 @@ function submitExam() {
   localStorage.setItem('examResults', JSON.stringify(allExams));
 
   renderStartExam();
-  fetchQuestions();
+  await fetchQuestions();
 
   const sidebarContentBottom = document.getElementById('sidebarBottom');
   sidebarContentBottom.innerHTML = `
@@ -1159,6 +1214,7 @@ function submitExam() {
   `;
   examData = {};
   totalTime = 0;
+  hideLoader();
 }
 
 // function formatDuration(ms) {
