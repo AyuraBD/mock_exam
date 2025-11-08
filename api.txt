@@ -1,0 +1,23 @@
+// when Load mock exam
+
+{
+			"username": "apiuser",
+			"email": "apiuser@gmail.com",
+			"password": "S3cret!",
+			"first_name": "Api",
+			"last_name": "User",
+			"phone_number": "1234567890",
+			"gender": "",
+			"location": ""
+		}
+
+// TODO 
+{
+    "created": true,
+    "username": "apiuser",
+    "email": "apiuser@gmail.com",
+    "first_name": "Api",
+    "last_name": "User"
+}
+
+    http://31.97.136.163:8000/api/create-user/

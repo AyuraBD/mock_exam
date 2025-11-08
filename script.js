@@ -1,5 +1,3 @@
-const apiUrl = "http://31.97.136.163:8000/api/";
-
 // Reset body style
 document.body.style.margin = "0";
 document.body.style.position = "relative";
@@ -197,7 +195,7 @@ startBtn.addEventListener('click', () => {
   console.log()
 
   setTimeout(()=>{
-    const previousResult = JSON.parse(localStorage.getItem('examResults'));
+    const previousResult = JSON.parse(localStorage.getItem('previously_taken'));
     hideLoader();
     
     if (previousResult) {
@@ -323,7 +321,7 @@ function startFirstExam(){
 
 // Previous exam results , last exam result and retake exam
 function renderStartExam() {
-  const allExams = JSON.parse(localStorage.getItem('examResults')) || [];  
+  const allExams = JSON.parse(localStorage.getItem('previously_taken')) || [];  
 
     main.innerHTML = `
       <div id="recentActivity" style="padding:60px 50px;">
@@ -387,15 +385,6 @@ function renderStartExam() {
             </div>
           </div>
         </div>
-
-        <div style="border: 1px solid gray; border-radius: 10px;">
-          <div style="font-family: var(--font-headings); background-color: var(--color-primary-light); padding: 15px; border-radius: 10px 10px 0px 0px;">
-            <h3 style="margin:0px; border-radius: 10px 10px 0px 0px;">YOUR PERFORMANCE BY CATEGORY</h3>
-          </div>
-          <div id="performanceBody" style="font-family: var(--font-mainText); padding: 20px;">
-
-          </div>
-        </div>
       </div>
     `;
 
@@ -442,7 +431,6 @@ function renderStartExam() {
       examTableBody.innerHTML = '';
 
       allExams.slice(0, 2).forEach(exam => {
-        const correctCount = exam.answers.filter(a => a.selectedOption === a.correctAnswer).length;
         // const wrongCount = questions.length - correctCount;
         const row = document.createElement('tr');
         const dateText = mode === 'ago'
@@ -458,8 +446,8 @@ function renderStartExam() {
 
         row.innerHTML = `
           <td>${dateText}</td>
-          <td>${Math.round((correctCount / questions.length) * 100)}% ${(correctCount / questions.length) * 100  >= 75 ? '✅' : ''}</td>
-          <td>${formatDuration(exam.duration)}</td>
+          <td>${Math.round((exam.correct_answers / questions.length) * 100)}% ${(exam.correct_answers / questions.length) * 100  >= 75 ? '✅' : ''}</td>
+          <td>${formatDuration(exam.total_time_seconds)}</td>
         `;
         examTableBody.appendChild(row);
       });
@@ -473,9 +461,7 @@ function renderStartExam() {
     // 🧾 Get last exam
     const lastExam = allExams[allExams.length - 1];
     if (lastExam) {
-      const correctCount = lastExam.answers.filter(q => q.selectedOption === q.correctAnswer).length;
-      const wrongCount = lastExam.answers.filter(q => q.selectedOption !== q.correctAnswer).length;
-      const percentage = Math.round((correctCount / questions.length) * 100);
+      const percentage = Math.round((lastExam.correct_answers / questions.length) * 100);
       const circle = document.querySelector('.progress-circle');
       const text = document.getElementById('percentageText');
 
@@ -487,9 +473,9 @@ function renderStartExam() {
       const degree = (percentage / 100) * 360;
       circle.style.background = `conic-gradient(${color} ${degree}deg, #e5e7eb ${degree}deg)`;
       text.textContent = `${percentage}%`;
-      document.getElementById('correctCountHeader').innerText = correctCount;
-      document.getElementById('correctCount').innerText = correctCount;
-      document.getElementById('wrongCount').innerText = wrongCount;
+      document.getElementById('correctCountHeader').innerText = lastExam.correct_answers;
+      document.getElementById('correctCount').innerText = lastExam.correct_answers;
+      document.getElementById('wrongCount').innerText = lastExam.incorrect_answers;
       document.getElementById('totalQuestions').innerText = questions.length;
     }
 
@@ -499,49 +485,6 @@ function renderStartExam() {
     document.getElementById('lastAttemp').innerHTML = `
       ${timeAgo(lastExam.finishedAt)}
     `;
-    // Performance by category
-    const answers = lastExam.answers || [];
-    const categoryStats = {};
-    answers.forEach(answer => {
-      const {category, selectedOption, correctAnswer} = answer;
-      if(!categoryStats[category]){
-        categoryStats[category] = {total:0, correct:0};
-      }
-      categoryStats[category].total++;
-      if(selectedOption === correctAnswer){
-        categoryStats[category].correct++;
-      }
-    });
-    for(const category in categoryStats){
-      const stats = categoryStats[category];
-      const percent = (Math.floor((stats.correct / stats.total) * 100));
-
-      const performanceBody = document.getElementById('performanceBody');
-      const performanceSingle = document.createElement('div');
-      performanceSingle.style.display ='flex';
-      performanceSingle.style.justifyContent ='between';
-      performanceSingle.style.alignItems = 'center'; 
-      performanceSingle.innerHTML = `
-        <div style="width:30%">
-          <img 
-            src="download.png" 
-            alt="Profile Picture" 
-            style="width:60px; height:60px; border-radius:50%; object-fit:cover;"
-          />
-        </div>
-        
-        <div style="width:70%;">
-          <div style="display:flex; justify-content: space-between; align-items:center;">
-            <p>${category}</p>
-            <p>${percent} %</p>
-          </div>
-          <div style="flex:1; background: var(--color-bg); border-radius:10px; height:12px; overflow:hidden;">
-            <div style="height:100%;width:${percent}%;background: var(--color-primary);transition:width 0.3s ease;"></div>
-          </div>
-        </div>
-      `;
-      performanceBody.appendChild(performanceSingle);
-    }
 
     const retakeExamBtn = document.getElementById('retakeExamBtn');
     retakeExamBtn.style.cursor = 'pointer';
@@ -580,14 +523,14 @@ let examData = {
     showLoader("Loading exam questions...");
 
     try {
-      const response = await fetch('https://6b3kct08il.execute-api.us-east-1.amazonaws.com/qa//exams/bpa?respectOrder=1');
+      const response = await fetch('output.json');
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       console.log(data);
-      document.getElementById('examName').textContent = data?.result?.name;
-      questions = data?.result?.questions ?? [];
-      result = data?.result;
-      totalTime = data?.result?.duration_seconds;
+      document.getElementById('examName').textContent = data?.exam?.name;
+      questions = data?.exam?.questions ?? [];
+      result = data?.exam;
+      totalTime = data?.exam?.duration_seconds;
     } catch (error) {
       console.error("Error fetching questions:", error);
     }finally{
@@ -647,6 +590,7 @@ function startTimer() {
     if(totalTime <= 0){
       clearInterval(timerInterval);
       alert("Times Up");
+      submitExam();
     }else{
       totalTime--;
       const hours = Math.floor(totalTime / 3600);
@@ -669,7 +613,7 @@ function renderSidebarBottom() {
   const indexContainer = document.getElementById('questionIndex');
   questions.map((q, idx) => {
     const btn = document.createElement('button');
-    btn.id = q.qid;
+    btn.id = q.id;
     btn.textContent = idx + 1;
     btn.style.width = '40px';
     btn.style.height = '35px';
@@ -720,11 +664,11 @@ function renderQuestion(index) {
   
   const optionsDiv = document.createElement('div');
   optionsDiv.id = 'options';
-  q.items.forEach((item, idx)=>{
+  q.answers.forEach((answer, idx)=>{
     const select = document.createElement('select');
     const option = document.createElement('option');
-    option.value = item;
-    option.textContent = item;
+    option.value = answer;
+    option.textContent = answer;
     select.appendChild(option);
     optionsDiv.appendChild(select);
   });
@@ -799,17 +743,17 @@ function renderQuestion(index) {
       </div>
 
       <div style="display:flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin:0px; font-family: var(--font-headings);">${q.text}</h3>
+        <h3 style="margin:0px; font-family: var(--font-headings);">${q.question}</h3>
         <p style="font-family: var(--font-mainText); display: flex; color: gray; margin:0px;">Question<span>[${index+1}]</span></p>
       </div>
       <div id="answersDiv" style="font-family: var(--font-mainText);">
         <ul style="list-style: none; padding: 0px;">
-          ${q.items.map(
-              (item, index) => `
+          ${q.answers.map(
+              (answer, index) => `
                 <li style="padding: 10px;">
                   <label id="optionLabel" class="optionLabel" style="padding: 10px;">
-                    <input type="radio" name="answer-${q.qid}" value="${item}" id="option-${q.qid}-${index}">
-                    ${item}
+                    <input type="radio" name="answer-${q.id}" value="${answer.answer}" id="option-${q.id}-${index}">
+                    ${answer.answer}
                   </label>
                 </li>
               `
@@ -856,209 +800,213 @@ function renderQuestion(index) {
   `;
   document.head.appendChild(style);
 
-  // Question's Image
-  const img = document.getElementById('patientImg');
-  const imgWrapper = document.getElementById('imgWrapper');
-  const imgName = document.getElementById('imgName');
+  // === Question's Image Section ===
+const img = document.getElementById('patientImg');
+const imgWrapper = document.getElementById('imgWrapper');
+const imgName = document.getElementById('imgName');
 
-  const buttons = [
-    { id: 'photoBtn', key: 'photo' },
-    { id: 'chartBtn', key: 'chart' },
-    { id: 'radioBtn', key: 'radiogram' },
-    { id: 'profileBtn', key: 'profile' }
-  ];
+const buttons = [
+  { id: 'photoBtn', name: 'Photo' },
+  { id: 'chartBtn', name: 'Chart' },
+  { id: 'radioBtn', name: 'Radiographs' },
+  { id: 'profileBtn', name: 'Profile' }
+];
 
-  // Filter out missing images
-  const availableTabs = buttons.filter(btn => q?.patient?.[btn.key]);
-  buttons.forEach(btn => {
-    const btnEl = document.getElementById(btn.id);
-    if (!q?.patient?.[btn.key]) {
-      btnEl.style.display = 'none'; // hide it if no image
-    }
+// Filter available images
+const availableImages = q?.images?.filter(imgObj =>
+  buttons.some(btn => btn.name.toLowerCase() === imgObj.image_name.toLowerCase())
+) || [];
+
+// Hide buttons with no matching image
+buttons.forEach(btn => {
+  const btnEl = document.getElementById(btn.id);
+  const found = q?.images?.some(
+    imgObj => imgObj.image_name.toLowerCase() === btn.name.toLowerCase()
+  );
+  if (!found && btnEl) btnEl.style.display = 'none';
+});
+
+// Set active tab UI
+function setActiveTab(activeId) {
+  buttons.forEach(b => {
+    const btnEl = document.getElementById(b.id);
+    if (btnEl) btnEl.classList.toggle('active', b.id === activeId);
   });
+}
 
-  // Update active tab UI
-  function setActiveTab(activeId) {
-    buttons.forEach(b => {
-      const btnEl = document.getElementById(b.id);
-      if (btnEl) btnEl.classList.toggle('active', b.id === activeId);
-    });
-  }
+// Show selected image
+function showImage(btn) {
+  const imgData = q?.images?.find(
+    imgObj => imgObj.image_name.toLowerCase() === btn.name.toLowerCase()
+  );
 
-  // Show image for selected tab
-  function showImage(btn) {
-    const imgSrc = q?.patient?.[btn.key];
-    if (imgSrc) {
-      img.src = imgSrc;
-      imgWrapper.style.display = 'block';
-      imgName.innerText = btn.key;
-      setActiveTab(btn.id);
-    } else {
-      imgWrapper.style.display = 'none';
-    }
-  }
-
-  // For available tabs
-  availableTabs.forEach(btn => {
-    document.getElementById(btn.id).addEventListener('click', () => showImage(btn));
-  });
-
-  // Show first available tab by default
-  if (availableTabs.length > 0) {
-    showImage(availableTabs[0]);
+  if (imgData) {
+    img.src = imgData.image_url;
+    imgWrapper.style.display = 'block';
+    imgName.innerText = btn.name;
+    setActiveTab(btn.id);
   } else {
     imgWrapper.style.display = 'none';
   }
+}
 
-  // Show first available tab dynamically
-  if (availableTabs.length > 0) {
-    showImage(availableTabs[0]); // first existing image
-  } else {
-    imgWrapper.style.display = 'none'; // hide wrapper if no images exist
+// Add event listeners for available image buttons
+buttons.forEach(btn => {
+  const btnEl = document.getElementById(btn.id);
+  if (btnEl) {
+    btnEl.addEventListener('click', () => showImage(btn));
   }
+});
 
-  // Zoom image on Click
-  const patientImg = document.getElementById('patientImg');
-  patientImg.addEventListener('click', () => {
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100vw';
-    overlay.style.height = '100vh';
-    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
-    overlay.style.display = 'flex';
-    overlay.style.justifyContent = 'center';
-    overlay.style.alignItems = 'center';
-    overlay.style.zIndex = '9999';
-    overlay.style.padding = '10px'; // for small screens
+// Show first available image by default
+if (availableImages.length > 0) {
+  const firstMatch = buttons.find(btn =>
+    availableImages.some(imgObj =>
+      imgObj.image_name.toLowerCase() === btn.name.toLowerCase()
+    )
+  );
+  if (firstMatch) showImage(firstMatch);
+} else {
+  imgWrapper.style.display = 'none';
+}
 
-    // Clone image
-    const zoomedImg = patientImg.cloneNode(true);
-    zoomedImg.style.width = '100%';
-    zoomedImg.style.height = 'auto';
-    zoomedImg.style.maxWidth = '800px';
-    zoomedImg.style.maxHeight = '90vh';
-    zoomedImg.style.borderRadius = '10px';
-    zoomedImg.style.objectFit = 'contain';
-    zoomedImg.style.cursor = 'zoom-out';
-    zoomedImg.style.transition = 'transform 0.3s ease';
-    zoomedImg.style.transform = 'scale(1.02)';
-    zoomedImg.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
+// === Zoom Image on Click ===
+const patientImg = document.getElementById('patientImg');
+patientImg.addEventListener('click', () => {
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100vw';
+  overlay.style.height = '100vh';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.zIndex = '9999';
+  overlay.style.padding = '10px';
 
-    overlay.appendChild(zoomedImg);
-    document.body.appendChild(overlay);
+  const zoomedImg = patientImg.cloneNode(true);
+  zoomedImg.style.width = '100%';
+  zoomedImg.style.height = 'auto';
+  zoomedImg.style.maxWidth = '800px';
+  zoomedImg.style.maxHeight = '90vh';
+  zoomedImg.style.borderRadius = '10px';
+  zoomedImg.style.objectFit = 'contain';
+  zoomedImg.style.cursor = 'zoom-out';
+  zoomedImg.style.transition = 'transform 0.3s ease';
+  zoomedImg.style.transform = 'scale(1.02)';
+  zoomedImg.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
 
-    // Remove zoom on click
-    overlay.addEventListener('click', () => {
-      document.body.removeChild(overlay);
-    });
+  overlay.appendChild(zoomedImg);
+  document.body.appendChild(overlay);
 
-    // Optional: prevent scroll behind overlay
-    document.body.style.overflow = 'hidden';
-    overlay.addEventListener('click', () => {
-      document.body.style.overflow = '';
-    });
+  // Remove zoom overlay on click
+  overlay.addEventListener('click', () => {
+    document.body.removeChild(overlay);
+    document.body.style.overflow = '';
   });
+
+  // Prevent background scroll
+  document.body.style.overflow = 'hidden';
+});
+
 
 
   // Restore previously selected answer if any and update it
-  const answered = selectedOptionAnswer.find(option => option.id === q.qid);
+  const answered = selectedOptionAnswer.find(option => option.id === q.id);
   if (answered) {
     const savedInput = document.querySelector(
-      `input[name="answer-${q.qid}"][value="${answered.selectedOption}"]`
+      `input[name="answer-${q.id}"][value="${answered.selectedOption}"]`
     );
     if (savedInput) savedInput.checked = true;
   }
 
   // ✅ Check Answer
   document.getElementById('checkBtn').addEventListener('click', () => {
-    // Remove the selected answer
-    selectedOptionAnswer = selectedOptionAnswer.filter(
-      (option) => option.id !== q.qid
-    );
+  // Remove old entry for this question
+  selectedOptionAnswer = selectedOptionAnswer.filter(
+    (option) => option.id !== q.id
+  );
 
-    const selected = document.querySelector(`input[name="answer-${q.qid}"]:checked`);
-    const radios = document.querySelectorAll(`input[name="answer-${q.qid}"]`);
-    const solutionDiv = document.getElementById('solutionDiv');
+  // Radio group now uses q.id (not q.id)
+  const selected = document.querySelector(`input[name="answer-${q.id}"]:checked`);
+  const radios = document.querySelectorAll(`input[name="answer-${q.id}"]`);
+  const solutionDiv = document.getElementById('solutionDiv');
 
-    document.querySelectorAll(`.answer-icon-${q.qid}`).forEach(el => el.remove());
-    radios.forEach(radio => {
-      const label = radio.parentElement;
-      
-      if(radio.value === q.correct_answer){
-        const icon = document.createElement('span');
-        icon.textContent = `✅`;
-        icon.classList.add(`answer-icon-${q.qid}`);
-        label.appendChild(icon);
-      }
-      if(selected && radio === selected && radio.value !== q.correct_answer){
-        const icon = document.createElement('span');
-        icon.textContent = `❌`;
-        icon.classList.add(`answer-icon-${q.qid}`);
-        label.appendChild(icon);
-      }
-      radio.disabled = true;
-    });
+  // Clear old icons
+  document.querySelectorAll(`.answer-icon-${q.id}`).forEach(el => el.remove());
 
-    const existingIndex = examData.answers.findIndex(item => item.id === q.qid);
-    if(existingIndex !== -1){
-      examData.answers[existingIndex].selectedOption = selected ? selected.value : null;
-    } else {
-      examData.answers.push({
-        id: q.qid,
-        selectedOption: selected ? selected.value : null,
-        correctAnswer: q.correct_answer,
-        category: q.category
-      });
+  // Find the correct answer from the new answers array
+  const correctAnswerObj = q.answers.find(ans => ans.is_correct === true);
+  const correctAnswerText = correctAnswerObj ? correctAnswerObj.answer : null;
+
+  // Show ✅ or ❌ beside each option
+  radios.forEach(radio => {
+    const label = radio.parentElement;
+
+    if (radio.value === correctAnswerText) {
+      const icon = document.createElement('span');
+      icon.textContent = `✅`;
+      icon.classList.add(`answer-icon-${q.id}`);
+      label.appendChild(icon);
     }
-    // let storedAnswers = JSON.parse(localStorage.getItem(currentExamId)) || [];
 
-    // const existingIndex = storedAnswers.findIndex(item => item.id === q.qid);
-    // if(existingIndex !== -1){
-    //   storedAnswers[existingIndex].selectedOption = selected ? selected.value : null;
-    // } else {
-    //   storedAnswers.push({
-    //     id:q.qid,
-    //     selectedOption: selected ? selected.value : null
-    //   })
-    // }
-    
-    // localStorage.setItem(currentExamId, JSON.stringify(storedAnswers));
+    if (selected && radio === selected && radio.value !== correctAnswerText) {
+      const icon = document.createElement('span');
+      icon.textContent = `❌`;
+      icon.classList.add(`answer-icon-${q.id}`);
+      label.appendChild(icon);
+    }
+    radio.disabled = true;
+  });
 
-    if (!selected) {
-      solutionDiv.innerHTML = `
+  // Update examData.answers
+  const existingIndex = examData.answers.findIndex(item => item.id === q.id);
+  if (existingIndex !== -1) {
+    examData.answers[existingIndex].selectedOption = selected ? selected.value : null;
+  } else {
+    examData.answers.push({
+      id: q.id,
+      selectedOption: selected ? selected.value : null,
+      correctAnswer: correctAnswerText,
+      category: q.category || null
+    });
+  }
+
+  // Show solution area
+  if (!selected) {
+    solutionDiv.innerHTML = `
       <div id="incorrect" style="background-color: #ec8856ff; padding: 20px;">
         <h3>Incorrect</h3>
-        ${q.solution_html}
+        ${q.solution}
       </div>
-    `
-    } else if(selected.value === q.correct_answer) {
-      solutionDiv.innerHTML = `
+    `;
+  } else if (selected.value === correctAnswerText) {
+    solutionDiv.innerHTML = `
       <div id="correct" style="background-color: #c0eddbff; padding: 20px;">
         <h3>Correct</h3>
-        ${q.solution_html}
+        ${q.solution}
       </div>
-    `
-    } else {
-      solutionDiv.innerHTML = `
+    `;
+  } else {
+    solutionDiv.innerHTML = `
       <div id="incorrect" style="background-color: #ec8856ff; padding: 20px;">
         <h3>Incorrect</h3>
-        ${q.solution_html}
+        ${q.solution}
       </div>
-    `
-    }
-    // localStorage.setItem(selected.value)
-  });
+    `;
+  }
+});
+
 
   // 🚩 Flag Question
   document.getElementById('flagBtn').addEventListener('click', () => {
-    if (!flaggedQuestions.includes(q.qid)){
-      flaggedQuestions.push(q.qid);
+    if (!flaggedQuestions.includes(q.id)){
+      flaggedQuestions.push(q.id);
       document.getElementById('flagBtn').style.borderLeft = '7px solid red';
     } else {
-      flaggedQuestions = flaggedQuestions.filter(qid => qid !== q.qid);
+      flaggedQuestions = flaggedQuestions.filter(id => id !== q.id);
       document.getElementById('flagBtn').style.borderLeft = '7px solid gray';
     }
     renderSidebarBottom(); // highlight flagged
@@ -1066,7 +1014,7 @@ function renderQuestion(index) {
   });
 
   const flagBtn = document.getElementById('flagBtn');
-  if(flaggedQuestions.includes(q.qid)){
+  if(flaggedQuestions.includes(q.id)){
     flagBtn.style.borderLeft = '7px solid red';
   }else{
     flagBtn.style.borderLeft = '7px solid gray';
@@ -1099,24 +1047,6 @@ function renderQuestion(index) {
     }
   });
   nextBtn.addEventListener('click', ()=>{
-    // When the user select an option and click the next button, we will save the selected option and the id of the question
-    // const selected = document.querySelector(`input[name="answer-${q.qid}"]:checked`);
-    // const checkedAnswer = examData.answers.find(answer => answer.id === q.qid );
-    // if(!checkedAnswer){
-    //   if(selected){
-    //     const existingIndex = selectedOptionAnswer.findIndex(option => option.id === q.qid);
-    //     if(existingIndex !== -1){
-    //       selectedOptionAnswer[existingIndex].selectedOption = selected.value;
-    //     }else{
-    //       selectedOptionAnswer.push({
-    //         id:q.qid,
-    //         selectedOption: selected.value,
-    //         correctAnswer: q.correct_answer
-    //       });
-    //     }
-    //   }
-    // }
-    
     // And go to next question
     if(currentQuestionIndex < questions.length -1){
       main.innerHTML = '';
@@ -1126,25 +1056,25 @@ function renderQuestion(index) {
     }
   });
 
-  const answeredOption = examData.answers.find(option => option.id === q.qid);
+  const answeredOption = examData.answers.find(option => option.id === q.id);
   if(answeredOption){
-    const savedInput = document.querySelector(`input[name="answer-${q.qid}"][value="${answeredOption.selectedOption}"]`);
+    const savedInput = document.querySelector(`input[name="answer-${q.id}"][value="${answeredOption.selectedOption}"]`);
     if(savedInput){
       savedInput.checked = true;
     }
-    const radios = document.querySelectorAll(`input[name="answer-${q.qid}"]`);
+    const radios = document.querySelectorAll(`input[name="answer-${q.id}"]`);
     radios.forEach(radio => {
       radio.disabled = true;
     });
 
-    document.querySelectorAll(`.answer-icon-${q.qid}`).forEach(el => el.remove());
+    document.querySelectorAll(`.answer-icon-${q.id}`).forEach(el => el.remove());
     radios.forEach(radio => {
       const label = radio.parentElement;
       // Correct answer gets
       if (radio.value === answeredOption.correctAnswer) {
         const icon = document.createElement('span');
         icon.textContent = '✅';
-        icon.classList.add(`answer-icon-${q.qid}`);
+        icon.classList.add(`answer-icon-${q.id}`);
         label.appendChild(icon);
       }
       // User's wrong answer gets
@@ -1155,7 +1085,7 @@ function renderQuestion(index) {
       ) {
         const icon = document.createElement('span');
         icon.textContent = '❌';
-        icon.classList.add(`answer-icon-${q.qid}`);
+        icon.classList.add(`answer-icon-${q.id}`);
         label.appendChild(icon);
       }
     });
@@ -1166,100 +1096,144 @@ function renderQuestion(index) {
       solutionDiv.innerHTML = `
         <div id="correct" style="background-color: #a8e9cfff; padding: 20px;">
           <h3>Correct</h3>
-          ${q.solution_html}
+          ${q.solution}
         </div>
       `;
     } else {
       solutionDiv.innerHTML = `
         <div id="incorrect" style="background-color: #f5a076ff; padding: 20px;">
           <h3>Incorrect</h3>
-          ${q.solution_html}
+          ${q.solution}
         </div>
       `;
     }
   }
 
   // Get merged answers of two arrays to show on UI
-  const answeredQ = getMergedAnswers().find(ans => ans.id === q.qid);
-  if(answeredQ && answeredQ.selectedOption){
-    const input = document.querySelector(`input[name="answer-${q.qid}"][value="${answeredQ.selectedOption}"]`);
-    if(input) input.checked = true;
+  const answeredQ = getMergedAnswers().find(ans => ans.id === q.id);
+  if (answeredQ && answeredQ.selectedOption) {
+    const input = document.querySelector(`input[name="answer-${q.id}"][value="${answeredQ.selectedOption}"]`);
+    if (input) input.checked = true;
   }
 
   // option selection listener
-  document.querySelectorAll(`input[name="answer-${q.qid}"]`).forEach(radio => {
+  document.querySelectorAll(`input[name="answer-${q.id}"]`).forEach(radio => {
     radio.addEventListener('change', () => {
-      const existingIndex = selectedOptionAnswer.findIndex(opt => opt.id === q.qid);
-      if(existingIndex !== -1){
+      // Find the correct answer dynamically from new structure
+      const correctAnswerObj = q.answers.find(ans => ans.is_correct === true);
+      const correctAnswerText = correctAnswerObj ? correctAnswerObj.answer : null;
+
+      // Check if this question already exists in selectedOptionAnswer
+      const existingIndex = selectedOptionAnswer.findIndex(opt => opt.id === q.id);
+
+      if (existingIndex !== -1) {
         selectedOptionAnswer[existingIndex].selectedOption = radio.value;
       } else {
         selectedOptionAnswer.push({ 
-          id: q.qid, 
+          id: q.id, 
           selectedOption: radio.value, 
-          correctAnswer: q.correct_answer,
-          category: q.category
+          correctAnswer: correctAnswerText,
+          category: q.category || null
         });
       }
+
       // update progress
       updateAnswerProgress();
     });
   });
+
 }
 
 // Get merged answers of arrays
 function getMergedAnswers() {
   const merged = [...examData.answers];
+
   selectedOptionAnswer.forEach(sel => {
     const idx = merged.findIndex(ans => ans.id === sel.id);
-    if(idx !== -1){
+
+    if (idx !== -1) {
+      // Update existing answer
       merged[idx].selectedOption = sel.selectedOption;
     } else {
+      // Add new answer record
       merged.push({
         id: sel.id,
         selectedOption: sel.selectedOption,
         correctAnswer: sel.correctAnswer || null,
-        category: sel.category
+        category: sel.category || null
       });
     }
   });
+
   return merged;
 }
 
-// Update Progress bar
+// ✅ Update Progress bar
 function updateAnswerProgress() {
   const mergedAnswers = getMergedAnswers();
   const answeredCount = mergedAnswers.filter(ans => ans.selectedOption).length;
-  const totalQuestions = questions.length;
+
+  // Support both old and new data structure (some APIs use `question` instead of `text`)
+  const totalQuestions = Array.isArray(questions) ? questions.length : 0;
   const percent = totalQuestions ? Math.round((answeredCount / totalQuestions) * 100) : 0;
 
   const bar = document.getElementById('answerProgressBar');
   const percentText = document.getElementById('answerPercent');
 
-  if(bar) bar.style.width = percent + '%';
-  if(percentText) percentText.textContent = `${percent}% Answered or checked`;
+  if (bar) bar.style.width = percent + '%';
+  if (percentText) percentText.textContent = `${percent}% Answered or checked`;
 }
 
-// submit exam
+
 async function submitExam() {
   showLoader('Your exam is submitting...');
   clearInterval(timerInterval);
 
+  // Add exam meta info
   examData.finishedAt = new Date().toISOString();
   examData.totalTime = totalTime;
   examData.duration = result.duration_seconds - totalTime;
 
-  // merge selected answers into examData.answers
+  // Merge answers
   examData.answers = getMergedAnswers();
 
-  const allExams = JSON.parse(localStorage.getItem('examResults')) || [];
+  // Calculate stats
+  const totalAnsweredQuestions = examData.answers.length;
+  const correctAnswers = examData.answers.filter(
+    a => a.selectedOption === a.correctAnswer
+  ).length;
+  const incorrectAnswers = totalAnsweredQuestions - correctAnswers;
+  const score = Math.round(
+    (correctAnswers / (result?.questions?.length || 1)) * 100
+  );
+  const totalTimeMinutes = Math.floor(examData.totalTime / 60);
 
-  // keep only last 2 exams
-  if(allExams.length >= 2) allExams.shift();
+  // Create payload according to new backend format
+  const payload = {
+    name: result?.name,
+    exam_code: currentExamId,
+    passing_score: 75,
+    duration_seconds: result?.duration_seconds || 0,
+    date: new Date().toISOString(),
+    // email: currentUser?.email,
+    score,
+    correct_answers: correctAnswers,
+    incorrect_answers: incorrectAnswers,
+    total_time_seconds: result.duration_seconds - totalTime,
+    finishedAt: new Date().toISOString()
+  };
 
-  allExams.push(examData);
-  console.log(examData);
-  localStorage.setItem('examResults', JSON.stringify(allExams));
+  console.log('📦 Payload being saved:', payload);
 
+  // Save to localStorage (previously_taken)
+  const previous = JSON.parse(localStorage.getItem('previously_taken')) || [];
+  
+  if (previous.length >= 2) previous.shift(); // keep last 2
+  previous.push(payload);
+  localStorage.setItem('previously_taken', JSON.stringify(previous));
+
+
+  // Reset / Refresh UI
   renderStartExam();
   await fetchQuestions();
 
@@ -1268,77 +1242,12 @@ async function submitExam() {
     <h3>Mock Exam</h3>
     <h4 id="examName" style="margin-top:0px; font-family: var(--font-headings);"></h4>
   `;
+
+  // Cleanup
   examData = {};
   totalTime = 0;
   hideLoader();
 }
-
-// async function submitExam() {
-//   showLoader('Your exam is submitting...');
-//   clearInterval(timerInterval);
-
-//   examData.finishedAt = new Date().toISOString();
-//   examData.totalTime = totalTime;
-//   examData.duration = result.duration_seconds - totalTime;
-//   examData.answers = getMergedAnswers();
-
-//   // 🧠 Build new structure
-//   const totalAnsweredQuestions = examData.answers.length;
-//   const correctAnswers = examData.answers.filter(a => a.selectedOption === a.correctAnswer).length;
-//   const incorrectAnswers = totalAnsweredQuestions - correctAnswers;
-//   const score = Math.round((correctAnswers / result?.questions?.length) * 100);
-//   const totalTimeMinutes = Math.floor(examData.totalTime / 60);
-
-//   const payload = {
-//     name: result?.name,
-//     exam_code: currentExamId,
-//     passing_score: 75,
-//     duration_seconds: result.duration_seconds,
-//     date: new Date().toISOString(),
-//     // email: currentUser.email,
-//     score,
-//     correct_answers: correctAnswers,
-//     incorrect_answers: incorrectAnswers,
-//     total_time_minutes: totalTimeMinutes
-//   };
-//   console.log(payload);
-
-
-//   //  Send data to backend
-//   try {
-//     const res = await fetch(`${apiUrl}/exam/submit`, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${userToken}`,
-//       },
-//       body: JSON.stringify(payload),
-//     });
-//     console.log(" Exam submitted successfully");
-//   } catch (err) {
-//     console.error("Failed to send exam data:", err);
-//   }
-
-//   // 🗃️ Local save
-//   const allExams = JSON.parse(localStorage.getItem('examResults')) || [];
-//   if (allExams.length >= 2) allExams.shift();
-//   allExams.push(examData);
-//   localStorage.setItem('examResults', JSON.stringify(allExams));
-
-//   // Reset UI
-//   renderStartExam();
-//   await fetchQuestions();
-//   document.getElementById('sidebarBottom').innerHTML = `
-//     <h3>Mock Exam</h3>
-//     <h4 id="examName" style="margin-top:0px; font-family: var(--font-headings);"></h4>
-//   `;
-
-//   examData = {};
-//   totalTime = 0;
-//   hideLoader();
-// }
-
-
 
 // function formatDuration(ms) {
 //   const totalSec = Math.floor(ms / 1000);
@@ -1405,6 +1314,9 @@ style.innerHTML = `
   @media (max-width: 992px) {
     #recentActivity{
       padding: 60px 20px!important;
+    }
+    #mainQuestionsWrapper {
+      padding: 60px 20px !important;
     }
   }
 

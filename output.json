@@ -1,0 +1,225 @@
+{
+    "exam": {
+        "name": "NBDHE® - Mock Exam (National Boards)",
+        "exam_code": "1J9L6",
+        "passing_score": 75,
+        "duration_seconds": 5400,
+        "date": "2025-11-07T19:11:11.298289+00:00",
+        "questions": [
+            {
+                "id": 1,
+                "question": "Q. The lesion present on the ventral surface of the tongue usually heals in,",
+                "solution": "<ul><li>Normal: Less than 120/80 mm Hg;</li><li>Elevated: Systolic between 120-129 <strong>and</strong> Diastolic less than 80 mm Hg;</li><li>Stage 1: Systolic between 130-139 <strong>or</strong> Diastolic between 80-89 mm Hg;</li><li>Stage 2: Systolic at least 140 <strong>or</strong> Diastolic at least 90 mm Hg;</li><li>Hypertensive crisis: Systolic over 180 and/or Diastolic over 120 mm Hg.</li></ul>",
+                "answers": [
+                    {
+                        "answer": "(A).\t1 day",
+                        "is_correct": false
+                    },
+                    {
+                        "answer": "(B).\t2-3 days",
+                        "is_correct": true
+                    },
+                    {
+                        "answer": "(C).\t7-10 days",
+                        "is_correct": false
+                    },
+                    {
+                        "answer": "(D).\t14-21 days",
+                        "is_correct": false
+                    }
+                ],
+                "images": [
+                    {
+                        "image_name": "Chart",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Dental-Chart-1024x576_9EHyhtS.jpg"
+                    },
+                    {
+                        "image_name": "Profile",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Patient-Profile3-1024x576_Vxvu9gh.jpg"
+                    },
+                    {
+                        "image_name": "Photo",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Photographs2-1024x576_J7FOa7l.jpg"
+                    },
+                    {
+                        "image_name": "Radiographs",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Radiographs2-1024x576_Ev1t6vV.jpg"
+                    }
+                ]
+            },
+            {
+                "id": 2,
+                "question": "Q. The patient is most likely experiencing pain under her tongue because she has a,",
+                "solution": "<ul><li>Normal: Less than 120/80 mm Hg;</li><li>Elevated: Systolic between 120-129 <strong>and</strong> Diastolic less than 80 mm Hg;</li><li>Stage 1: Systolic between 130-139 <strong>or</strong> Diastolic between 80-89 mm Hg;</li><li>Stage 2: Systolic at least 140 <strong>or</strong> Diastolic at least 90 mm Hg;</li><li>Hypertensive crisis: Systolic over 180 and/or Diastolic over 120 mm Hg.</li></ul>",
+                "answers": [
+                    {
+                        "answer": "(A).\tHerpetic lesion",
+                        "is_correct": false
+                    },
+                    {
+                        "answer": "(B).\tLingual varicosity",
+                        "is_correct": false
+                    },
+                    {
+                        "answer": "(C).\tAphthous ulcer",
+                        "is_correct": true
+                    },
+                    {
+                        "answer": "(D).\tFibroma",
+                        "is_correct": false
+                    }
+                ],
+                "images": [
+                    {
+                        "image_name": "Chart",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Dental-Chart-1024x576_XHemLwd.jpg"
+                    },
+                    {
+                        "image_name": "Profile",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Patient-Profile3-1024x576_i3pWsvE.jpg"
+                    },
+                    {
+                        "image_name": "Photo",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Photographs2-1024x576_fvlSbir.jpg"
+                    },
+                    {
+                        "image_name": "Radiographs",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Radiographs2-1024x576_8PDEpWd.jpg"
+                    }
+                ]
+            },
+            {
+                "id": 3,
+                "question": "Q. When is the ideal time to schedule a patient with medical conditions described in this case?",
+                "solution": "<ul><li>Normal: Less than 120/80 mm Hg;</li><li>Elevated: Systolic between 120-129 <strong>and</strong> Diastolic less than 80 mm Hg;</li><li>Stage 1: Systolic between 130-139 <strong>or</strong> Diastolic between 80-89 mm Hg;</li><li>Stage 2: Systolic at least 140 <strong>or</strong> Diastolic at least 90 mm Hg;</li><li>Hypertensive crisis: Systolic over 180 and/or Diastolic over 120 mm Hg.</li></ul>",
+                "answers": [
+                    {
+                        "answer": "(A).\tBefore breakfast",
+                        "is_correct": false
+                    },
+                    {
+                        "answer": "(B).\tIn the morning, after breakfast",
+                        "is_correct": false
+                    },
+                    {
+                        "answer": "(C).\tLate in the afternoon",
+                        "is_correct": true
+                    },
+                    {
+                        "answer": "(D).\tRight before the patient takes her medication",
+                        "is_correct": false
+                    }
+                ],
+                "images": [
+                    {
+                        "image_name": "Chart",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Dental-Chart-1024x576_yAoIM7p.jpg"
+                    },
+                    {
+                        "image_name": "Profile",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Patient-Profile3-1024x576_N2aDvfv.jpg"
+                    },
+                    {
+                        "image_name": "Photo",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Photographs2-1024x576_x6d6ZF0.jpg"
+                    },
+                    {
+                        "image_name": "Radiographs",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Radiographs2-1024x576_ySHMtpO.jpg"
+                    }
+                ]
+            },
+            {
+                "id": 4,
+                "question": "Q. The patient’s blood pressure can be categorized as,",
+                "solution": "<ul><li>Normal: Less than 120/80 mm Hg;</li><li>Elevated: Systolic between 120-129 <strong>and</strong> Diastolic less than 80 mm Hg;</li><li>Stage 1: Systolic between 130-139 <strong>or</strong> Diastolic between 80-89 mm Hg;</li><li>Stage 2: Systolic at least 140 <strong>or</strong> Diastolic at least 90 mm Hg;</li><li>Hypertensive crisis: Systolic over 180 and/or Diastolic over 120 mm Hg.</li></ul>",
+                "answers": [
+                    {
+                        "answer": "(A).\tNormal",
+                        "is_correct": false
+                    },
+                    {
+                        "answer": "(B).\tElevated",
+                        "is_correct": false
+                    },
+                    {
+                        "answer": "(C).\tStage 1",
+                        "is_correct": true
+                    },
+                    {
+                        "answer": "(D).\tStage 2",
+                        "is_correct": false
+                    }
+                ],
+                "images": [
+                    {
+                        "image_name": "Photo",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Photographs2-1024x576.jpg"
+                    },
+                    {
+                        "image_name": "Chart",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Dental-Chart-1024x576.jpg"
+                    },
+                    {
+                        "image_name": "Profile",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Patient-Profile3-1024x576.jpg"
+                    },
+                    {
+                        "image_name": "Radiographs",
+                        "image_url": "http://cecoursepro.com/media/protected/question-images/2025/11/07/Case-1-Radiographs2-1024x576.jpg"
+                    }
+                ]
+            }
+        ]
+    },
+    "previously_taken": [
+        {
+            "name": "NBDHE® - Mock Exam (National Boards)",
+            "exam_code": "1J9L6",
+            "passing_score": 75,
+            "duration_seconds": 5400,
+            "date": "2025-11-07T19:11:11.298289+00:00",
+            "email": "smesporso@gmail.com",
+            "score": 85,
+            "correct_answers": 17,
+            "incorrect_answers": 3,
+            "total_time_minutes": 30
+        },
+        {
+            "name": "NBDHE® - Mock Exam (National Boards)",
+            "exam_code": "1J9L6",
+            "passing_score": 75,
+            "duration_seconds": 5400,
+            "date": "2025-11-07T19:11:11.298289+00:00",
+            "email": "smesporso@gmail.com",
+            "score": 85,
+            "correct_answers": 17,
+            "incorrect_answers": 3,
+            "total_time_minutes": 30
+        },
+        {
+            "name": "NBDHE® - Mock Exam (National Boards)",
+            "exam_code": "1J9L6",
+            "passing_score": 75,
+            "duration_seconds": 5400,
+            "date": "2025-11-07T19:11:11.298289+00:00",
+            "email": "smesporso@gmail.com",
+            "score": 85,
+            "correct_answers": 17,
+            "incorrect_answers": 3,
+            "total_time_minutes": 30
+        },
+        {
+            "name": "NBDHE® - Mock Exam (National Boards)",
+            "exam_code": "1J9L6",
+            "passing_score": 75,
+            "duration_seconds": 5400,
+            "date": "2025-11-07T19:11:11.298289+00:00",
+            "email": "smesporso@gmail.com",
+            "score": 85,
+            "correct_answers": 17,
+            "incorrect_answers": 3,
+            "total_time_minutes": 30
+        }
+    ]
+}
